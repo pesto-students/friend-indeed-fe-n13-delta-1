@@ -26,13 +26,13 @@ jobs:
             ${{ runner.OS }}-
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Lint code
         run: npm run lint
 
-      - name: Check types
-        run: npm run type-check
+      - name: Format Code
+        run: npm run format
 
       - name: Run test suite
         run: npm test
