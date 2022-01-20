@@ -1,6 +1,6 @@
 <div id="top"></div>
 
-[![Contributors][contributors-shield]][contributors-url]
+[![Netlify Status](https://api.netlify.com/api/v1/badges/84446d2e-379f-4178-bd64-6a03166b651c/deploy-status)](https://app.netlify.com/sites/friendindeed/deploys)
 
 
 
