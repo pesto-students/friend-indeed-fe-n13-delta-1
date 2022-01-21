@@ -1,44 +1,109 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app), using the [Redux](https://redux.js.org/) and [Redux Toolkit](https://redux-toolkit.js.org/) template.
+<div id="top"></div>
 
-## Available Scripts
+[![Netlify Status](https://api.netlify.com/api/v1/badges/84446d2e-379f-4178-bd64-6a03166b651c/deploy-status)](https://app.netlify.com/sites/friendindeed/deploys)
 
-In the project directory, you can run:
 
-### `npm start`
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+<!-- PROJECT LOGO -->
+<br />
+<div align="center">
+  <a href="https://github.com/pesto-students/friend-indeed-fe-n13-delta-1">
+    <img src="public/logo192.png" alt="Logo" width="80" height="80">
+  </a>
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+  <h3 align="center">Friend Indeed</h3>
+  <p align="center">
+    Consult experienced therapists from your home at ease. Easy video consultations. Book a free counseling session now!
+    <br />
+    <a href="https://friendindeed.netlify.app/">View Demo</a>
+  </p>
+</div>
 
-### `npm test`
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-### `npm run build`
+<!-- TABLE OF CONTENTS -->
+<details>
+  <summary>Table of Contents</summary>
+  <ol>
+    <li>
+      <a href="#about-the-project">About The Project</a>
+      <ul>
+        <li><a href="#built-with">Built With</a></li>
+      </ul>
+    </li>
+    <li>
+      <a href="#getting-started">Getting Started</a>
+      <ul>
+        <li><a href="#prerequisites">Prerequisites</a></li>
+        <li><a href="#installation">Installation</a></li>
+      </ul>
+    </li>
+    <li><a href="#usage">Usage</a></li>
+  </ol>
+</details>
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+<!-- ABOUT THE PROJECT -->
+## About The Project
 
-### `npm run eject`
+[![Friend Indeed Screen Shot][product-screenshot]](https://example.com)
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Built With
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+* [React.js](https://reactjs.org/)
+* [Ant Design](https://ant.design/)
+* [Redux Toolkit](https://redux-toolkit.js.org/)
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
 
-## Learn More
+<!-- GETTING STARTED -->
+## Getting Started
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+To get a local copy up and running follow these simple example steps.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Installation
+
+1. Clone the repo
+   ```sh
+   git clone https://github.com/pesto-students/friend-indeed-fe-n13-delta-1.git
+   ```
+2. Install NPM packages
+   ```sh
+   npm install
+   ```
+3. Run the app
+   ```sh
+   npm start
+   ```
+
+<p align="right">(<a href="#top">back to top</a>)</p>
+
+
+
+<!-- USAGE EXAMPLES -->
+## Usage
+
+ - Browse top notch therapists from every domain
+ - Check their profile
+ - Book session directly if you're impressed by their track record.
+
+<p align="right">(<a href="#top">back to top</a>)</p>
+
+<!-- CONTACT -->
+## Contact
+
+Joel Vinay Kumar - [@coderspider](https://twitter.com/coderspider) - joelvinaykumar@gmail.com
+
+Sanyam Bharani - [@twitter_handle](https://twitter.com/twitter_handle) - sanyambharani07@gmail.com
+
+Project Link: [https://github.com/pesto-students/friend-indeed-fe-n13-delta-1](https://github.com/pesto-students/friend-indeed-fe-n13-delta-1)
+
+
+<p align="right">(<a href="#top">back to top</a>)</p>
+
+
+
+<!-- MARKDOWN LINKS & IMAGES -->
+
+[product-screenshot]: src/shared/assets/Therapist-ProfileView.png

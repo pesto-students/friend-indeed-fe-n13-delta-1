@@ -1,6 +1,6 @@
 import React from 'react';
 import logo from './logo.svg';
-import { Counter } from './features/counter/Counter';
+import { Counter } from './counter/Counter';
 import './App.css';
 
 function App() {
@@ -10,7 +10,7 @@ function App() {
         <img src={logo} className="App-logo" alt="logo" />
         <Counter />
         <p>
-          Edit <code>src/App.tsx</code> and save to reload.
+          Edit <code>src/App.tsx</code> and save to reload
         </p>
         <span>
           <span>Learn </span>
@@ -20,7 +20,7 @@ function App() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            React
+            FriendIndeed
           </a>
           <span>, </span>
           <a
