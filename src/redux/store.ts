@@ -1,9 +1,13 @@
 import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
-import counterReducer from '../counter/counterSlice';
+
+// slices
+import upcomingMeetingsReducer from '../UpcomingMeetings/upcomingMeetingsSlice';
+import counterReducer from '../counter/counterSlice'
 
 export const store = configureStore({
   reducer: {
     counter: counterReducer,
+    upcomingMeetings: upcomingMeetingsReducer,
   },
 });
 
