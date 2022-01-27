@@ -1,10 +1,13 @@
 import React from 'react';
+import styled from 'styled-components'
 import { Menu, Avatar, Dropdown } from 'antd'
 import theme from '../utils/theme';
+import { greeter } from '../utils/helper';
 
 const Navbar = () => {
 
   const loggedIn = true
+  const name = greeter() + ', Joel Vinay Kumar'
   const logo_url = 'https://res.cloudinary.com/friendindeed/image/upload/v1642823421/FI_Logo.png'
   const profile_url = 'https://res.cloudinary.com/practicaldev/image/fetch/s--Lt6uKVNG--/c_fill,f_auto,fl_progressive,h_320,q_auto,w_320/https://dev-to-uploads.s3.amazonaws.com/uploads/user/profile_image/322705/1412670d-03f2-4342-bf66-483956dde97a.jpeg'
 
@@ -25,55 +28,78 @@ const Navbar = () => {
   );
 
   return (
-    <div
-      style={{
-        width: '100%',
-        height: '80px',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        fontSize: '20px'
-      }}
-    >
-      <a
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          height: '100%',
-          width: '180px',
-          cursor: 'pointer',
-          color: 'black'
-        }}
+    <Container>
+      <LogoArea
         href='/'
       >
         <Avatar size={40} shape='circle' src={logo_url} />
-        <p>Friend Indeed</p>
-      </a>
+        <p className='logo_name'>Friend Indeed</p>
+      </LogoArea>
       {!loggedIn ? (
-        <Menu mode='horizontal' theme='light' style={{ listStyleType: 'none' }}>
+        <StyledMenu mode='horizontal' theme='light'>
           <Menu.Item>For Therapists</Menu.Item>
           <Menu.Item>For Patients</Menu.Item>
           <Menu.Item>Contact Us</Menu.Item>
-        </Menu>
+        </StyledMenu>
       ) : (
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            height: '100%',
-            width: '210px'
-          }}
-        >
-            <p>Joel Vinay Kumar</p>
-          <Dropdown overlay={menu}>
+        <Profile>
+          <p>
+            <StyledSpan>{greeter()}</StyledSpan>
+            , Joel Vinay Kumar
+          </p>
+          <StyledDropDown overlay={menu}>
             <Avatar size={40} shape='circle' src={profile_url} />
-          </Dropdown>
-        </div>
+          </StyledDropDown>
+        </Profile>
       )}
-    </div>
+    </Container>
   );
 };
 
 export default Navbar;
+
+const Container = styled.div`
+  width: 100%;
+  height: 80px;
+  display: flex;
+  justify-content: space-between;
+  align-Items: center;
+  font-Size: 20px;
+
+  @media (max-width: 450px) {
+    font-size: 15px;
+
+    .logo_name {
+      display: none;
+    }
+  }
+`;
+
+const LogoArea = styled.a`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100%;
+  width: 180px;
+  cursor: pointer;
+  color: black;
+`;
+
+const StyledMenu = styled(Menu)`  
+  list-style-type: none;
+`;
+
+const Profile = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100%;
+`;
+
+const StyledSpan = styled.span`
+  color: ${theme.secondaryText};
+`;
+
+const StyledDropDown = styled(Dropdown)`
+  margin-left: 10px
+`;
