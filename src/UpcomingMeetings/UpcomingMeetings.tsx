@@ -33,7 +33,7 @@ const UpcomingMeetings: FC = () => {
           count={3}
           baseColor={theme.copperBlue}
         />
-      ): ucmState?.data.map((meeting, i) => (
+      ): ucmState?.data.map((meeting) => (
           <MeetingCard {...{ ...meeting }} />
         ))
       }
