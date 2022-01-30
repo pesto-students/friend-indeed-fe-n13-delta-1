@@ -19,3 +19,8 @@ code {
 p {
   margin: 0;
 }
+
+.ant-btn-primary {
+  background: rgba(7, 48, 66, 1);
+  border: 0;
+}

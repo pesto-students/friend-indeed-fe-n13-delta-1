@@ -1,20 +1,67 @@
-export const greeter = () => {
-  // let hours = new Date().getHours()
-  const Xmas95 = new Date('December 25, 1995 23:15:30');
-  const hours = Xmas95.getHours();
+import axios from 'axios'
+import { stringify } from 'qs'
+import { notification } from 'antd'
 
-  console.log(hours);
-  switch (true) {
-    case hours>=20 && hours<=24:
-      return 'Good Night'
-    case hours>=6 && hours<12:
-      return 'Good Morning'
-    case hours>=12 && hours<=2:
-      return 'Good Afternoon'
-    case hours>=3 && hours<=7:
-      return 'Good Evening'
+import { PROD_URL, STAGING_URL, STORAGE_KEY_CONSTANT } from './constants';
+
+export const Logout = () => {
+  localStorage.removeItem(STORAGE_KEY_CONSTANT)
+}
+
+export const greeter = () => {
+  const now = new Date().getHours();
+
+  if (now < 12)
+      return 'Good Morning';
+  else if (now >= 12 && now <= 17)
+      return 'Good Afternoon';
+  else if (now >= 17 && now <= 24)
+      return 'Good Evening';
+}
+
+export const API = axios.create({
+  baseURL: process.env.ENV === 'staging' ? STAGING_URL :PROD_URL,
+  headers: { 
+    "access-control-allow-origin": "*",
+  },
+  paramsSerializer: params => stringify(params, { arrayFormat: 'brackets' })
+})
+
+API.interceptors.response.use((response) => response, (error) => {
+
+  const statusCode = error.response.status;
+  const message = error.response.data.message;
+
+  switch (statusCode) {
+    case 400:
+      notification.error({
+        message: "Invalid details submitted in form",
+        description: message
+      })
+      break;
+    case 401:
+      notification.error({
+        message: "Authentication Failure",
+        description: "Seems session was offline for long. Please login again"
+      })
+      Logout();
+      break;
+    case 403:
+      notification.error({
+        message: "Authorization Failure",
+        description: message
+      })
+      break;
+    case statusCode > 403 && statusCode < 500:
+      notification.error({
+        message: message
+      })
+      break;
     default:
+      notification.error({
+        message: "Internal Server Error",
+        description: message
+      })
       break;
   }
-
-}
+});

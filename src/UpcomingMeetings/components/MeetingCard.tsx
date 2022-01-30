@@ -39,7 +39,7 @@ const Container = styled.div`
   display: flex;
   align-items: center;
   font-style: italic;
-  transition: all 0.05s ease-in;
+  transition: all 0.2s ease;
   cursor: default;
 
   &:hover {

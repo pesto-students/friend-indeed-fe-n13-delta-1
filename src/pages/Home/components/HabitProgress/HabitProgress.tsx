@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { Typography } from 'antd'
 import Skeleton from 'react-loading-skeleton'
 
-import theme from '../shared/utils/theme'
+import theme from '../../../../shared/utils/theme'
 
 const HabitProgress = () => {
 
@@ -65,12 +65,12 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 20px;
+  padding: 20px 0 20px 0;
 `;
 
 const ProgressBox = styled.div`
-  height: 40px;
-  border-radius: 20px;
+  height: 30px;
+  border-radius: 15px;
   background-color: ${theme.copperBlue};
   width: 50%;
   display: flex;
@@ -84,8 +84,8 @@ const ProgressBox = styled.div`
 `;
 
 const ProgressBar = styled.div<{ width: number }>`
-  height: 40px;
-  border-radius: 20px;
+  height: 30px;
+  border-radius: 15px;
   float: left;
   display: flex;
   align-items: center;

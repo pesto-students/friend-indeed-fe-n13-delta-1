@@ -22,7 +22,10 @@ const UpcomingMeetings: FC = () => {
   
   return (
     <Container>
-      <Typography.Title level={3}>
+      <Typography.Title
+        level={4}
+        style={{ color: theme.copperBlue }}
+      >
         Your upcoming sessions
       </Typography.Title>
       {isLoading? (
@@ -33,8 +36,8 @@ const UpcomingMeetings: FC = () => {
           count={3}
           baseColor={theme.copperBlue}
         />
-      ): ucmState?.data.map((meeting) => (
-          <MeetingCard {...{ ...meeting }} />
+      ): ucmState?.data.map((meeting, i) => (
+          <MeetingCard key={i} {...{ ...meeting }} />
         ))
       }
       
@@ -50,8 +53,4 @@ const Container = styled.div`
   flex-direction: column;
   align-items: center;
   padding-bottom: 30px;
-`;
-
-const StyledSkeleton = styled(Skeleton)`
-  width: 50%;
 `;

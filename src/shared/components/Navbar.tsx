@@ -7,7 +7,6 @@ import { greeter } from '../utils/helper';
 const Navbar = () => {
 
   const loggedIn = true
-  const name = greeter() + ', Joel Vinay Kumar'
   const logo_url = 'https://res.cloudinary.com/friendindeed/image/upload/v1642823421/FI_Logo.png'
   const profile_url = 'https://res.cloudinary.com/practicaldev/image/fetch/s--Lt6uKVNG--/c_fill,f_auto,fl_progressive,h_320,q_auto,w_320/https://dev-to-uploads.s3.amazonaws.com/uploads/user/profile_image/322705/1412670d-03f2-4342-bf66-483956dde97a.jpeg'
 
@@ -30,7 +29,7 @@ const Navbar = () => {
   return (
     <Container>
       <LogoArea
-        href='/'
+        href='/dashboard'
       >
         <Avatar size={40} shape='circle' src={logo_url} />
         <p className='logo_name'>Friend Indeed</p>
@@ -65,6 +64,7 @@ const Container = styled.div`
   justify-content: space-between;
   align-Items: center;
   font-Size: 20px;
+  margin: 0;
 
   @media (max-width: 450px) {
     font-size: 15px;

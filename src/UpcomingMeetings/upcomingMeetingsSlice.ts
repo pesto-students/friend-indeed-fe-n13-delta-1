@@ -1,6 +1,6 @@
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
-import { RootState, AppThunk } from '../redux/store';
+import { RootState } from '../redux/store';
 import { fetchMeetings } from './upcomingMeetingsAPI';
 
 export interface MeetingCardProps {
@@ -23,7 +23,6 @@ const initialState: UCMeetingsState = {
 export const fetchMeetingsAsync = createAsyncThunk(
   'upcomingMeetings/fetchData',
   async () => {
-    console.log('hello')
     const response = await fetchMeetings();
     return response.data;
   }

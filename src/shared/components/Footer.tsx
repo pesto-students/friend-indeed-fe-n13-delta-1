@@ -16,6 +16,6 @@ export default Footer;
 const Container = styled.footer`
   background-color: ${theme.primary};
   height: 100px;
-  position: fixed;
+  width: 100%;
   bottom: 0;
 `;
