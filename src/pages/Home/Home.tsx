@@ -1,30 +1,19 @@
 import styled from 'styled-components'
-import { Row, Col, Spin } from 'antd'
-import { useDispatch } from 'react-redux';
 import Skeleton from 'react-loading-skeleton'
 
-import { HabitProgress, FilterBar, TherapistInfoCard } from './components';
+import { HabitProgress, FilterBar } from './components';
 
 import theme from '../../shared/utils/theme'
 import { useAppSelector } from '../../redux/hooks';
-import { fetchTherapistsAsync, fetchCategoriesAsync, selectData } from './HomeSlice';
+import { selectData } from './HomeSlice';
 
 import './index.css'
-import { useEffect } from 'react';
-import { TherapistInfoCardProps } from './components/TherapistInfoCard/TherapistInfoCard';
-import UpcomingMeetings from '../../UpcomingMeetings';
+import UpcomingMeetings from './components/UpcomingMeetings';
 
 const Home = () => {
 
-  const state = useAppSelector(selectData);
-  const dispatch = useDispatch()
-  const therapistsLoading = state.status === 'therapistsloading'
+  const state = useAppSelector(selectData);  
   const categoriesloading = state.status === 'categoriesloading'
-
-  useEffect(() => {
-    dispatch(fetchTherapistsAsync())
-    dispatch(fetchCategoriesAsync())
-  }, [])
 
   return (
     <>
@@ -34,7 +23,7 @@ const Home = () => {
       </Wrapper>
       <FilterArea>
         {categoriesloading
-        ? <Skeleton width={1050} height={100} borderRadius={20} />
+        ? <Skeleton width='80vw' height={100} borderRadius={20} />
         : <FilterBar categories={state.categories} />
         }
         {/* <PopupButton
@@ -60,25 +49,7 @@ const Home = () => {
           text="Book Now @ 788"
           url="https://calendly.com/joelvinaykumar/15min"
         /> */}
-        <StyledRow gutter={[16, 24]}>
-          {therapistsLoading
-          ? (
-            <LoaderDiv>
-              {Array(3).fill(0).map(_ => (
-                <Skeleton
-                  width={250}
-                  height={300}
-                  borderRadius={15}
-                />
-              ))}
-            </LoaderDiv>
-          )
-          : state.data.map((info: TherapistInfoCardProps) => (
-            <StyledCol span={8}>
-              <TherapistInfoCard {...info} categories={state.categories} />
-            </StyledCol>
-          ))}
-        </StyledRow>
+        
       </FilterArea>
     </>
   );
@@ -97,21 +68,4 @@ const FilterArea = styled.div`
   align-items: center;
   background-color: white;
   padding-top: 30px;
-`;
-
-const StyledRow = styled(Row)`
-  width: 80%;
-  margin: 50px 0;
-`;
-
-const StyledCol = styled(Col)`
-  display: flex;
-  justify-content: center;
-`;
-
-const LoaderDiv = styled.div`
-  display: flex;
-  width: 100%;
-  justify-content: space-between;
-  align-items: center;
 `;

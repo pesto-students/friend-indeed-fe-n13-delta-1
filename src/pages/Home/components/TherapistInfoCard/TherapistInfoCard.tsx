@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { Avatar, Typography, Tag } from 'antd'
+import { Avatar, Typography, Tag, Rate } from 'antd'
 import { useNavigate } from 'react-router-dom'
 
 import theme from '../../../../shared/utils/theme';
@@ -47,21 +47,23 @@ function TherapistInfoCard({
           {!!experience && <SubTitle>{`${experience} years of experience`}</SubTitle>}
         </Info>
         {rating && (
-          <p>
-            {/* <StarIcon /> */}
-            {rating}/5
-          </p>
+          <StyledRate disabled value={rating} />
         )}
       </InfoDiv>
       <CategoriesDiv>
-        {cardCategories.map((name) => (<StyledTag color='default'>{name}</StyledTag>))}
+        {cardCategories.map((name) => (<StyledTag key={name} color='default'>{name}</StyledTag>))}
       </CategoriesDiv>
       <FooterDiv>
-        <Rate>
+        <Fee>
           &#8377; {consultationFee}
           <PerSession>/ Session</PerSession>
-        </Rate>
-        <Button width={38} buttonFontSize={12} name='Book Now' onClick={() => navigate('my-profile')} />
+        </Fee>
+        <Button
+          width={45}
+          buttonFontSize={11}
+          name='Book Now'
+          onClick={() => navigate('my-profile')}
+        />
       </FooterDiv>
     </Card>
   );
@@ -129,7 +131,12 @@ const SubTitle = styled(Typography.Text)`
   color: ${theme.secondaryText};
 `;
 
-const Rate = styled(Typography.Text)`
+const StyledRate = styled(Rate)`
+  font-size: 12px;
+  margin-left: 5px;
+`;
+
+const Fee = styled(Typography.Text)`
   font-size: 13px;
   color: ${theme.copperBlue};
 `;

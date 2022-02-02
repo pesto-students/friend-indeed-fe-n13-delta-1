@@ -1,11 +1,23 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 import styled from 'styled-components'
-import { Row, Col, Select, Input, Typography } from 'antd'
+import { Row, Col, Select, Input, Typography, Empty } from 'antd'
 import { SearchOutlined, FilterFilled } from '@ant-design/icons'
+import Skeleton from 'react-loading-skeleton'
 
-import Button from '../../../../shared/components/Button';
+import { Button } from '../../../../shared/components';
+import { TherapistInfoCard } from '..'
 import theme from '../../../../shared/utils/theme';
-import { CategoryProps } from '../../HomeSlice';
+import {
+  CategoryProps,
+  selectData,
+  setFilters,
+  fetchCategoriesAsync,
+  fetchTherapistsAsync
+} from '../../HomeSlice';
+import { useAppSelector } from '../../../../redux/hooks';
+import { TherapistInfoCardProps } from '../TherapistInfoCard/TherapistInfoCard';
+import { experiencesOptions, feesOptions, ratingsOptions } from '../../../../shared/utils/constants';
 
 type FilterBarProps = {
   categories: CategoryProps[]
@@ -13,73 +25,121 @@ type FilterBarProps = {
 
 function FilterBar({ categories }: FilterBarProps) {
 
+  const dispatch = useDispatch()
+  const state = useAppSelector(selectData)
   const { Option } = Select
-  type OptionType = { code: string , name: string }
+  type OptionType = { code: string, name: string, label: string | number }
+  const therapistsLoading = state.status === 'therapistsloading'
 
-  const inputs = [
-    {
-      placholder: 'Issue',
-      items: categories.map(c => ({ name: c.name, code: c.id }))
-    },
-    {
-      placholder: 'Rating',
-      items: [
-        { name: '1', code: '1' },
-        { name: '2', code: '2' },
-        { name: '3', code: '3' },
-        { name: '4', code: '4' },
-        { name: '5', code: '5' },
-      ]
-    },
-    {
-      placholder: 'Experience',
-      items: [
-        { name: '< 5 years', code: '5' },
-        { name: '< 8 years', code: '5' },
-        { name: '< 10 years', code: '10' },
-        { name: '< 15 years', code: '15' },
-        { name: '< 20 years', code: '20' },
-      ]
-    },
-    {
-      placholder: 'Consultation Fee',
-      items: [
-        { name: '< 500', code: '500' },
-        { name: '< 800', code: '800' },
-        { name: '< 1000', code: '1000' },
-        { name: '< 1500', code: '1500' },
-      ]
-    }
-  ]
+  const [category, setCategory] = useState<any>('');
+  const [rating, setRating] = useState<any>('');
+  const [fee, setFee] = useState<any>('');
+  const [experience, setExperience] = useState<any>('');
+
+  useEffect(() => {
+    dispatch(fetchCategoriesAsync())
+  }, [])
+
+  useEffect(() => {
+    dispatch(fetchTherapistsAsync(state.filters))
+  }, [state.filters])
 
   return (
     <Container>
-      <StyledRow gutter={[16, 24]}>
-        {inputs.map(({ placholder, items }, index) => (
-          <Col span={5} key={index}>
-            <StyledSelect placeholder={placholder}>
-              {items.map(({ code, name }: OptionType) => (
-                <Option key={code}>
+      <FilterContainer>
+        <StyledRow gutter={[16, 24]}>
+          <Col span={5}>
+            <StyledSelect
+              placeholder='Issue'
+              onChange={value => setCategory(value)}
+            >
+              {categories.map(({ name }) => (
+                <Option value={name}>
                   <T>{name}</T>
                 </Option>
               ))}
             </StyledSelect>
           </Col>
-        ))}
-      </StyledRow>
-      <StyledRow>
-        <Col span={15}>
-          <Input placeholder='Search therapists by name...' suffix={<SearchIcon />} />
-        </Col>
-        <Col span={6}>
-          <Button
-            width={100}
-            icon={<FilterIcon />}
-            name='Apply Filters'
-            onClick={() => null}
-          />
-        </Col>
-      </StyledRow>
+          <Col span={5}>
+            <StyledSelect
+              placeholder='Rating'
+              onChange={value => setRating(value)}
+            >
+              {ratingsOptions.map(({ label, value }) => (
+                <Option value={value}>
+                  <T>{label}</T>
+                </Option>
+              ))}
+            </StyledSelect>
+          </Col>
+          <Col span={5}>
+            <StyledSelect
+              placeholder='Experience'
+              onChange={value => setExperience(value)}
+            >
+              {experiencesOptions.map(({ label, value }) => (
+                <Option value={value}>
+                  <T>{label}</T>
+                </Option>
+              ))}
+            </StyledSelect>
+          </Col>
+          <Col span={5}>
+            <StyledSelect
+              placeholder='Consultation Fee'
+              onChange={value => setFee(value)}
+            >
+              {feesOptions.map(({ label, value }) => (
+                <Option value={value}>
+                  <T>{label}</T>
+                </Option>
+              ))}
+            </StyledSelect>
+          </Col>
+        </StyledRow>
+        <StyledRow>
+          <Col span={15}>
+            <Input placeholder='Search therapists by name...' suffix={<SearchIcon />} />
+          </Col>
+          <Col span={6}>
+            <Button
+              width={100}
+              icon={<FilterIcon />}
+              name='Apply Filters'
+              onClick={() => dispatch(setFilters({
+                category,
+                rating,
+                experience,
+                fee
+              }))}
+            />
+          </Col>
+        </StyledRow>
+      </FilterContainer>
+      <TherapistGrid gutter={[16, 24]}>
+        {therapistsLoading
+          ? (
+            <LoaderDiv>
+              {Array(3).fill(0).map((_, i) => (
+                <Skeleton
+                  key={i}
+                  width={250}
+                  height={300}
+                  borderRadius={15}
+                />
+              ))}
+            </LoaderDiv>
+          )
+          : (state.data.length === 0 
+            ? <StyledEmpty description='Sorry, no therapists found. Try again.' />
+            : state.data.map((info: TherapistInfoCardProps) => (
+              <StyledCol key={info.id} span={8}>
+                <TherapistInfoCard {...info} categories={state.categories} />
+              </StyledCol>
+            )
+          )
+        )}
+      </TherapistGrid>
     </Container>
   );
 }
@@ -87,6 +147,13 @@ function FilterBar({ categories }: FilterBarProps) {
 export default FilterBar;
 
 const Container = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+const FilterContainer = styled.div`
   width: 80%;
   border-radius: 15px;
   margin: 20px 0 30px 0;
@@ -120,4 +187,28 @@ const SearchIcon = styled(SearchOutlined)`
 
 const FilterIcon = styled(FilterFilled)`
   color: ${theme.neonGreen}
+`;
+
+const TherapistGrid = styled(Row)`
+  width: 80%;
+  margin: 50px 0;
+  display: flex;
+  justify-content: center;
+`;
+
+const StyledCol = styled(Col)`
+  display: flex;
+  justify-content: center;
+`;
+
+const LoaderDiv = styled.div`
+  display: flex;
+  width: 80%;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const StyledEmpty = styled(Empty)`
+  height: 300px;
+  width: 100%;
 `;

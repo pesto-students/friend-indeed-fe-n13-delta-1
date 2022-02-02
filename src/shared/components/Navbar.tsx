@@ -1,27 +1,32 @@
 import React from 'react';
 import styled from 'styled-components'
-import { Menu, Avatar, Dropdown } from 'antd'
+import { Menu, Avatar, Dropdown, Typography } from 'antd'
 import theme from '../utils/theme';
 import { greeter } from '../utils/helper';
+import { ROUTES } from '../utils/constants';
+import { useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
+
+  const navigate = useNavigate();
 
   const loggedIn = true
   const logo_url = 'https://res.cloudinary.com/friendindeed/image/upload/v1642823421/FI_Logo.png'
   const profile_url = 'https://res.cloudinary.com/practicaldev/image/fetch/s--Lt6uKVNG--/c_fill,f_auto,fl_progressive,h_320,q_auto,w_320/https://dev-to-uploads.s3.amazonaws.com/uploads/user/profile_image/322705/1412670d-03f2-4342-bf66-483956dde97a.jpeg'
+  const default_profile_url = 'https://avatars.dicebear.com/api/miniavs/username-happy.svg'
 
   const menuItems = [
-    { title: 'My Profile' },
-    { title: 'My Sessions' },
-    { title: 'Logout' }
+    { title: 'My Profile', route: ROUTES.MY_PROFILE },
+    { title: 'My Sessions', route: ROUTES.MY_SESSIONS },
+    { title: 'Logout', route: ROUTES.HOME }
   ]
 
   const menu = (
     <Menu>
       {menuItems.map(item => (
-        <Menu.Item key={item.title} style={{ width: '150px', textAlign: 'center', color: theme.copperBlue }} >
+        <StyledMenuItem key={item.title} onClick={() => navigate(item.route)} >
           {item.title}
-        </Menu.Item>
+        </StyledMenuItem>
       ))}
     </Menu>
   );
@@ -31,7 +36,7 @@ const Navbar = () => {
       <LogoArea
         href='/dashboard'
       >
-        <Avatar size={40} shape='circle' src={logo_url} />
+        <StyledAvatar size={40} shape='circle' src={logo_url} />
         <p className='logo_name'>Friend Indeed</p>
       </LogoArea>
       {!loggedIn ? (
@@ -42,12 +47,12 @@ const Navbar = () => {
         </StyledMenu>
       ) : (
         <Profile>
-          <p>
+          <Typography.Text>
             <StyledSpan>{greeter()}</StyledSpan>
             , Joel Vinay Kumar
-          </p>
+          </Typography.Text>
           <StyledDropDown overlay={menu}>
-            <Avatar size={40} shape='circle' src={profile_url} />
+            <Avatar size={40} shape='circle' src={profile_url || default_profile_url} />
           </StyledDropDown>
         </Profile>
       )}
@@ -77,12 +82,14 @@ const Container = styled.div`
 
 const LogoArea = styled.a`
   display: flex;
-  justify-content: space-between;
   align-items: center;
   height: 100%;
-  width: 180px;
   cursor: pointer;
   color: black;
+`;
+
+const StyledAvatar = styled(Avatar)`
+  margin-right: 10px;
 `;
 
 const StyledMenu = styled(Menu)`  
@@ -91,7 +98,6 @@ const StyledMenu = styled(Menu)`
 
 const Profile = styled.div`
   display: flex;
-  justify-content: space-between;
   align-items: center;
   height: 100%;
 `;
@@ -101,5 +107,11 @@ const StyledSpan = styled.span`
 `;
 
 const StyledDropDown = styled(Dropdown)`
-  margin-left: 10px
+  margin-left: 10px;
+`;
+
+const StyledMenuItem = styled(Menu.Item)`
+  width: 150px;
+  text-align: center;
+  color: ${theme.copperBlue};
 `;

@@ -27,6 +27,9 @@ export default AppSkeleton;
 
 const StyledLayout = styled(Layout)`
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
 `;
 
 const StyledHeader = styled(Header)`
