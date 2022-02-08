@@ -1,8 +1,12 @@
-import React from 'react';
+import { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import Skeleton from 'react-loading-skeleton';
 import { CalendlyEventListener, DateAndTimeSelectedEvent, PopupButton } from 'react-calendly'
-import { Row, Col, Image, Typography, List, Comment, Rate } from 'antd'
+import {
+  Row, Col, Image, Typography, List, Comment, Rate,
+  Modal, Popconfirm, Skeleton as AntSkeleton, Input,
+  Upload, Popover, notification, Tag
+} from 'antd'
 import { UploadOutlined, EditFilled } from '@ant-design/icons'
 
 import PageHeader from '../../shared/components/PageHeader';
@@ -10,19 +14,118 @@ import { DEFAULT_PROFILE_URL } from '../../shared/utils/constants';
 import { Button } from '../../shared/components';
 import theme from '../../shared/utils/theme';
 import { useAppSelector } from '../../redux/hooks';
-import { selectData } from './MyProfile.slice';
+import { fetchPatientProfileAsync, fetchTherapistProfileAsync, initiatePaymentAsync, selectData, uploadPhotoAsync, User } from './MyProfile.slice';
+import AuthContext from '../../shared/context/AuthContext';
+import { useDispatch } from 'react-redux';
+import { Link, useSearchParams } from 'react-router-dom';
+import { EditProfile } from './components';
 
 function MyProfile() {
 
-  const state = useAppSelector(selectData)
-  const loading = state.status === 'loading'
-  const isTherapist = true
+  const dispatch = useDispatch()
+  const { data, order, status } = useAppSelector(selectData)
+  const loading = ['therapistProfileLoading', 'patientProfileLoading'].includes(status)
+  const { user } = useContext(AuthContext)
+  const userIsTherapist: boolean = user.role === User.therapist
+  const urlParams = useSearchParams()
+  const therapistId: string | null = urlParams[0].get('userId')
+  const patientViewsTherapist: boolean = !!therapistId && !userIsTherapist
+  const patientViewsSelf: boolean = !therapistId && !userIsTherapist
+  const therapistViewsSelf: boolean = !therapistId && userIsTherapist
+
+  const [openFeedbackModal, setOpenFeedbackModal] = useState(false)
+  const [openEditForm, setOpenEditForm] = useState(false)
+
+  const openModal = () => setOpenFeedbackModal(true)
+  const closeModal = () => setOpenFeedbackModal(false)
+  const closeDrawer = () => setOpenEditForm(false)
+  const modalStyles = {
+    okButtonProps: { style: { fontFamily: 'DM Sans', borderRadius: '20px' } },
+    cancelButtonProps: { style: { fontFamily: 'DM Sans', borderRadius: '20px' } }
+  }
+
+  function loadScript(src: string) {
+    return new Promise((resolve) => {
+        const script = document.createElement("script");
+        script.src = src;
+        script.onload = () => {
+            resolve(true);
+        };
+        script.onerror = () => {
+            resolve(false);
+        };
+        document.body.appendChild(script);
+    });
+  }
+
+  async function displayRazorpay() {
+    const res = await loadScript(
+        "https://checkout.razorpay.com/v1/checkout.js"
+    );
+
+    if (!res) {
+        alert("Razorpay SDK failed to load. Are you online?");
+        return;
+    }
+
+    dispatch(initiatePaymentAsync())
+
+    if (!order) {
+        alert("Server error. Are you online?");
+        return;
+    }
+
+    const { amount, id: order_id, currency } = order;
+
+    const options = {
+        key: "rzp_test_r6FiJfddJh76SI", // Enter the Key ID generated from the Dashboard
+        amount: amount.toString(),
+        currency: currency,
+        name: "Friend Indeed",
+        description: "Test Transaction",
+        order_id: order_id,
+        handler: async function (response: any) {
+            const data = {
+                orderCreationId: order_id,
+                razorpayPaymentId: response.razorpay_payment_id,
+                razorpayOrderId: response.razorpay_order_id,
+                razorpaySignature: response.razorpay_signature,
+            };
+
+            console.log(response)
+
+            // const result = await axios.post("http://localhost:5000/payment/success", data);
+
+            // alert(result.data.msg);
+        },
+        prefill: {
+            name: user.name,
+            email: user.email,
+        },
+        theme: {
+            color: theme.primary,
+        },
+    };
+    // @typescript-eslint/ban-ts-comment
+    // const paymentObject = new window.Razorpay(options);
+    // paymentObject.open();
+}
+
+  useEffect(() => {
+    if(patientViewsTherapist){
+      dispatch(fetchTherapistProfileAsync(String(therapistId)))
+    } else if (therapistViewsSelf) {
+      dispatch(fetchTherapistProfileAsync(user.id))
+    } else {
+      dispatch(fetchPatientProfileAsync(user.id))
+    }
+  }, [userIsTherapist])
 
   return (
     <Container>
       <PageHeader title='My Profile' />
       <SubContainer>
-        <ProfileColumn span={5}>
+        <ProfileColumn span={6}>
           {loading
           ? (
             <>
@@ -32,78 +135,155 @@ function MyProfile() {
                 borderRadius={20}
                 style={{ marginBottom: 20 }}
               />
-              <Skeleton
-                width={150}
-                height={30}
-                borderRadius={20}
-              />
+              {(therapistViewsSelf || patientViewsSelf) && (
+                <Skeleton
+                  width={150}
+                  height={30}
+                  borderRadius={20}
+                />
+              )}
             </>
           )
           : (
-            <>
-            <Picture src={DEFAULT_PROFILE_URL} />
-            <StyledButton
-              name='Upload Picture'
-              onClick={() => null}
-              width={55}
-              height={30}
-              buttonFontSize={5}
-              icon={<UploadIcon />}
-            />
-          </>
-        )}
+            <FullWidthDiv>
+              <Picture src={data?.imageUrl || DEFAULT_PROFILE_URL} />
+              {(therapistViewsSelf || patientViewsSelf) && (
+                <>
+                  <Upload
+                    {...{
+                      onChange: (info: any) => dispatch(uploadPhotoAsync(info.fileList[0])),
+                      style: {
+                        width: '50%'
+                      }
+                    }}
+                  >
+                    <Button
+                      name='Change Picture'
+                      icon={<UploadIcon />}
+                      height={30}
+                      width={100}
+                    />
+                  </Upload>
+                </>
+              )}
+            </FullWidthDiv>
+          )}
         </ProfileColumn>
-        <InfoColumn span={12}>
-          <Title level={2} style={{ color: theme.copperBlue }}>Profile</Title>
-          <P>Joel Vinay Kumar</P>
-          <P>lavotivinay@gmail.com</P>
-          <P>8801156292</P>
-          <Title level={2} style={{ color: theme.copperBlue }}>Feedback/Rating</Title>
-          <List
-            header={`${2} ratings`}
-            itemLayout='horizontal'
-            dataSource={[
-              {
-                author: 'Dr. Sachidanand',
-                avatar: 'https://avatars.dicebear.com/api/miniavs/joel-happy.svg',
-                content: 'Very happy ith the service',
-                date: new Date().toDateString(),
-                rating: 3.5
-              },
-              {
-                author: 'Dr. Suchitra',
-                avatar: 'https://avatars.dicebear.com/api/miniavs/joel-happy.svg',
-                content: 'Helpful session',
-                date: new Date().toDateString(),
-                rating: 4
-              }
-            ]}
-            renderItem={item => (
-              <Comment
-                author={(
-                  <p>
-                    {item.author}<br />
-                    <StyledRate allowHalf disabled value={item.rating} />
-                  </p>
+        <InfoColumn span={11}>
+          <StyledAntSkeleton  loading={loading} active={loading}>
+            <Title level={2} style={{ color: theme.copperBlue }}>Profile</Title>
+            <P>{data?.name}</P>
+            <P>{data?.email}</P>
+            {userIsTherapist && (
+              <>
+                {!!data?.about && <P><blockquote>{`About Myself : ${data?.about}`}</blockquote></P>}
+                {!!data?.qualification && data?.qualification?.map((q: string) => <P>{q}</P>)}
+                {!!data?.experience && <P>{`${data?.experience} years of experience`}</P>}
+                {!!data?.bookingUrl && (
+                  <P>
+                    <Link to={data?.bookingUrl} target='_blank'>Booking Link</Link>
+                  </P>
                 )}
-                avatar={item.avatar}
-                content={item.content}
-                datetime={item.date}
-                actions={[
-                  <span key="comment-edit">Edit</span>,
-                  <span key="comment-delete">Delete</span>
-                ]}
-              />
+                {!!data?.rating && (
+                  <P>
+                    {'Average Rating: '}
+                    <StyledRate
+                      disabled
+                      size={15}
+                      value={data?.rating} 
+                    />
+                  </P>
+                )}
+                {!!data?.consultationFee && (
+                  <Fee>
+                    &#8377; {data?.consultationFee}
+                    <PerSession>/ Session</PerSession>
+                  </Fee>
+                )}
+              </>
             )}
-          />
-          <Title level={2} style={{ color: theme.copperBlue }}>Subscriptions</Title>
+          </StyledAntSkeleton>
+          {data?.feedback && (
+            <StyledAntSkeleton loading={loading} active={loading}>
+              <Title level={2} style={{ color: theme.copperBlue }}>Feedback/Rating</Title>
+              <List
+                header={`${data?.feedback?.length || 0} ratings`}
+                itemLayout='horizontal'
+                dataSource={data?.feedback}
+                renderItem={item => (
+                  <Comment
+                    author={(
+                      <p>
+                        {item?.patient?.name}<br />
+                        <StyledRate allowHalf disabled value={item.rating} />
+                      </p>
+                    )}
+                    avatar={item?.patient?.imageUrl || DEFAULT_PROFILE_URL}
+                    content={item.comment}
+                    datetime={new Date(item.createdAt).toUTCString()}
+                    actions={patientViewsSelf ? [
+                      <span key="comment-edit" onClick={openModal}>Edit</span>,
+                      <Popconfirm
+                        title='Do you confirm deleting this rating ?'
+                        onConfirm={() => null}
+                        {...modalStyles}
+                      >
+                        <span key="comment-delete">Delete</span>
+                      </Popconfirm>
+                    ]: []}
+                  />
+                )}
+              />
+            </StyledAntSkeleton>
+          )}
+          <StyledAntSkeleton loading={loading} active={loading}>
+            {patientViewsSelf && (
+              <Title level={2} style={{ color: theme.copperBlue }}>Subscriptions</Title>
+            )}
+          </StyledAntSkeleton>
         </InfoColumn>
         <ActionsColumn span={7}>
-          {isTherapist
+          {loading
           ? (
+            <>
+              <Skeleton
+                width={250}
+                height={60}
+                borderRadius={40}
+              />
+              <TagsArea>
+                {[50, 100, 40, 120, 80].map(w => (
+                  <ChipSkeleton
+                    width={w}
+                    height={30}
+                    borderRadius={15}
+                  />
+                ))}
+              </TagsArea>
+            </>
+          )
+          : (therapistViewsSelf || patientViewsSelf)
+          ? (
+            <>
+              <StyledButton
+                name='Edit Profile'
+                description='Keep your profile updated to get more bookings'
+                onClick={() => setOpenEditForm(true)}
+                width={80}
+                height={60}
+                icon={<EditIcon />}
+              />
+              {data?.categories && (
+                <TagsArea>
+                  { data?.categories.map(c => <StyledTag>{c?.category?.name}</StyledTag>)}
+                </TagsArea>
+              )}
+            </>
+          )
+          : (
             <CalendlyEventListener
               onDateAndTimeSelected={function (e: DateAndTimeSelectedEvent){
-                console.log(e.data);
+                console.log(e.data.event.length > 0);
               }}
             >
               <PopupButton
@@ -116,34 +296,42 @@ function MyProfile() {
                   textColor: theme.copperBlue,
                 }}
                 styles={{
-                  borderRadius: 20,
+                  borderRadius: 40,
                   color: theme.neonGreen,
                   backgroundColor: theme.copperBlue,
-                  padding: '5px 15px',
+                  padding: '20px 30px',
                   border: 0,
                   cursor: 'pointer'
                 }}
                 prefill={{
-                  email: "joelvinaykumar@gmail.com",
-                  name: "John"
+                  email: user.email,
+                  name: user.name
                 }}
-                text="Book Now @ 599"
-                url="https://calendly.com/joelvinaykumar/15min"
+                text={`Book a session now for ₹ ${data?.consultationFee}`}
+                url={data?.bookingUrl || ''}
               />
             </CalendlyEventListener>
-          )
-          : (
-            <StyledButton
-              name='Edit Profile'
-              description='Keep your profile updated to get more bookings'
-              onClick={() => null}
-              width={80}
-              height={60}
-              icon={<EditIcon />}
-            />
           )}
         </ActionsColumn>
       </SubContainer>
+      {openFeedbackModal && (
+        <Modal
+          closable
+          visible={openFeedbackModal}
+          title='Edit Feedback'
+          okText='Update'
+          onCancel={closeModal}
+          {...modalStyles}
+        />
+      )}
+      {openEditForm && (
+        <EditProfile
+          visible={openEditForm}
+          onClose={closeDrawer}
+          user={data}
+          userIsTherapist={userIsTherapist}
+        />
+      )}
     </Container>
   );
 }
@@ -174,11 +362,19 @@ const ProfileColumn = styled(Col)`
   align-items: center;
 `;
 
+const FullWidthDiv = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
 const Picture = styled(Image)<{ src: string }>`
   width: 150px;
   height: 150px;
   border-radius: 20px;
   background: ${theme.lightblue} url("${props => props.src}") no-repeat fixed center;
+  box-shadow: 0 3px 10px rgb(0 0 0 / 0.3);
   margin-bottom: 20px;
 
   $:hover {
@@ -188,10 +384,28 @@ const Picture = styled(Image)<{ src: string }>`
 
 const UploadIcon = styled(UploadOutlined)`
   color: ${theme.neonGreen};
+  margin-right: 5px;
 `;
 
 const EditIcon = styled(EditFilled)`
   color: ${theme.neonGreen};
+`;
+
+const TagsArea = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 30px;
+  width: 70%;
+`;
+
+const StyledTag = styled(Tag)`
+  background-color: ${theme.chip};
+  color: ${theme.copperBlue};
+  border: 0;
+  font-size: 15px;
+  border-radius: 15px;
+  padding: 5px 10px;
+  margin: 10px 5px;
 `;
 
 const StyledButton = styled(Button)`
@@ -210,16 +424,33 @@ const Title = styled(Typography.Title)`
 const P = styled(Typography.Text)`
   margin-bottom: 10px;
   color: ${theme.secondary};
-  fpnt-size: 16px;
+  font-size: 16px;
 `;
 
-const StyledRate = styled(Rate)`
-  font-size: 12px;
+const Fee = styled(Typography.Text)`
+  font-size: 16px;
+  color: ${theme.copperBlue};
+`;
+
+const PerSession = styled(Typography.Text)`
+  color: ${theme.secondaryText};
+`;
+
+
+const StyledRate = styled(Rate)<{ size?: number, width?: number}>`
+  font-size: ${props => props.size? props.size: 12}px;
   margin-left: 5px;
 `;
 
 const ActionsColumn = styled(Col)`
   display: flex;
   flex-direction: column;
-  align-items: center;
+`;
+
+const StyledAntSkeleton = styled(AntSkeleton)`
+  width: 75%;
+`;
+
+const ChipSkeleton = styled(Skeleton)`
+  margin: 10px 5px;
 `;

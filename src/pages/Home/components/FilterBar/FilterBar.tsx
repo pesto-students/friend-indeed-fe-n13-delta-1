@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components'
-import { Row, Col, Select, Input, Typography, Empty } from 'antd'
+import { Row, Col, Select, Input, Typography, Empty, Divider, List, Spin } from 'antd'
 import { SearchOutlined, FilterFilled } from '@ant-design/icons'
 import Skeleton from 'react-loading-skeleton'
+import InfiniteScroll from 'react-infinite-scroll-component'
 
 import { Button } from '../../../../shared/components';
 import { TherapistInfoCard } from '..'
@@ -13,22 +14,19 @@ import {
   selectData,
   setFilters,
   fetchCategoriesAsync,
-  fetchTherapistsAsync
-} from '../../HomeSlice';
+  fetchTherapistsAsync,
+  incrementPage
+} from '../../Home.slice';
 import { useAppSelector } from '../../../../redux/hooks';
 import { TherapistInfoCardProps } from '../TherapistInfoCard/TherapistInfoCard';
 import { experiencesOptions, feesOptions, ratingsOptions } from '../../../../shared/utils/constants';
 
-type FilterBarProps = {
-  categories: CategoryProps[]
-}
 
-function FilterBar({ categories }: FilterBarProps) {
+function FilterBar() {
 
   const dispatch = useDispatch()
   const state = useAppSelector(selectData)
   const { Option } = Select
-  type OptionType = { code: string, name: string, label: string | number }
   const therapistsLoading = state.status === 'therapistsloading'
 
   const [category, setCategory] = useState<any>('');
@@ -48,19 +46,19 @@ function FilterBar({ categories }: FilterBarProps) {
     <Container>
       <FilterContainer>
         <StyledRow gutter={[16, 24]}>
-          <Col span={5}>
+          <Col xs={12} md={5} lg={6}>
             <StyledSelect
               placeholder='Issue'
               onChange={value => setCategory(value)}
             >
-              {categories.map(({ name }) => (
+              {state.categories.map(({ name }) => (
                 <Option value={name}>
                   <T>{name}</T>
                 </Option>
               ))}
             </StyledSelect>
           </Col>
-          <Col span={5}>
+          <Col xs={12} md={5} lg={6}>
             <StyledSelect
               placeholder='Rating'
               onChange={value => setRating(value)}
@@ -72,7 +70,7 @@ function FilterBar({ categories }: FilterBarProps) {
               ))}
             </StyledSelect>
           </Col>
-          <Col span={5}>
+          <Col xs={12} md={5} lg={6}>
             <StyledSelect
               placeholder='Experience'
               onChange={value => setExperience(value)}
@@ -84,7 +82,7 @@ function FilterBar({ categories }: FilterBarProps) {
               ))}
             </StyledSelect>
           </Col>
-          <Col span={5}>
+          <Col xs={12} md={5} lg={6}>
             <StyledSelect
               placeholder='Consultation Fee'
               onChange={value => setFee(value)}
@@ -97,11 +95,11 @@ function FilterBar({ categories }: FilterBarProps) {
             </StyledSelect>
           </Col>
         </StyledRow>
-        <StyledRow>
-          <Col span={15}>
+        <StyledRow gutter={[16, 24]}>
+          <Col xs={24} lg={15}>
             <Input placeholder='Search therapists by name...' suffix={<SearchIcon />} />
           </Col>
-          <Col span={6}>
+          <Col xs={24} lg={6}>
             <Button
               width={100}
               icon={<FilterIcon />}
@@ -110,35 +108,52 @@ function FilterBar({ categories }: FilterBarProps) {
                 category,
                 rating,
                 experience,
-                fee
+                fee,
+                page: 1
               }))}
             />
           </Col>
         </StyledRow>
       </FilterContainer>
-      <TherapistGrid gutter={[16, 24]}>
-        {therapistsLoading
-          ? (
-            <LoaderDiv>
-              {Array(3).fill(0).map((_, i) => (
-                <Skeleton
-                  key={i}
-                  width={250}
-                  height={300}
-                  borderRadius={15}
-                />
-              ))}
-            </LoaderDiv>
-          )
-          : (state.data.length === 0 
+      <TherapistGrid id="scrollableDiv">
+        <InfiniteScroll
+          style={{ overflow: 'hidden' }}
+          dataLength={state.dataCount}
+          next={() => {
+            dispatch(fetchTherapistsAsync({ page: state.filters.page+1 }))
+            dispatch(incrementPage())
+          }}
+          hasMore={!state.data.length}
+          loader={<Spin />}
+          endMessage={<Divider plain>End of list 🤐</Divider>}
+          scrollableTarget="scrollableDiv"
+        >
+          <List
+            grid={{
+              gutter: 24,
+              xs: 1,
+              sm: 1,
+              md: 2,
+              lg: 3
+            }}
+            style={{ flexWrap: 'wrap' }}
+            dataSource={state.data}
+            loading={therapistsLoading}
+            renderItem={(info: TherapistInfoCardProps) => (
+              <List.Item style={{ display: 'flex', justifyContent: 'center' }}>
+                <TherapistInfoCard {...info} />
+              </List.Item>
+            )}
+          />
+          {/* {state.data.length === 0 
             ? <StyledEmpty description='Sorry, no therapists found. Try again.' />
             : state.data.map((info: TherapistInfoCardProps) => (
               <StyledCol key={info.id} span={8}>
                 <TherapistInfoCard {...info} categories={state.categories} />
               </StyledCol>
-            )
-          )
-        )}
+            ))
+          } */}
+        </InfiniteScroll>
       </TherapistGrid>
     </Container>
   );
@@ -156,7 +171,7 @@ const Container = styled.div`
 const FilterContainer = styled.div`
   width: 80%;
   border-radius: 15px;
-  margin: 20px 0 30px 0;
+  margin: 20px 0;
   padding: 5px;
   background-color: rgba(7, 48, 66, 0.2);
   margin: 0 auto;
@@ -169,6 +184,10 @@ const StyledRow = styled(Row)`
   justify-content: space-between;
   padding: 0 70px;
   margin: 20px 0;
+
+  @media (max-width: 950px) {
+    padding: 0 10px;
+  }
 `;
 
 const StyledSelect = styled(Select)`
@@ -189,11 +208,16 @@ const FilterIcon = styled(FilterFilled)`
   color: ${theme.neonGreen}
 `;
 
-const TherapistGrid = styled(Row)`
+const TherapistGrid = styled.div`
   width: 80%;
   margin: 50px 0;
-  display: flex;
-  justify-content: center;
+  // display: flex;
+  // justify-content: center;
+
+  @media (max-width: 450px) {
+    width: 90%;
+  }
+
 `;
 
 const StyledCol = styled(Col)`

@@ -4,6 +4,7 @@ import Footer from "./Footer";
 import Navbar from "./Navbar";
 import NotFound from "./NotFound";
 import PrivateRoute from "./PrivateRoute";
+import Fallback from "./Fallback";
 
 export {
   Navbar,
@@ -11,5 +12,6 @@ export {
   AppSkeleton,
   Button,
   NotFound,
-  PrivateRoute
+  PrivateRoute,
+  Fallback
 }

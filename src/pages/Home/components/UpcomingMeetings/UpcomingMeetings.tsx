@@ -1,23 +1,27 @@
-import React, { FC, useEffect } from 'react';
+import React, { FC, useContext, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components'
 import { Typography } from 'antd'
 import Skeleton from 'react-loading-skeleton'
 
 import { useAppSelector } from '../../../../redux/hooks';
-import { fetchUpcomingMeetingsAsync, selectData } from '../../HomeSlice';
+import { fetchUpcomingMeetingsAsync, selectData } from '../../Home.slice';
 import theme from '../../../../shared/utils/theme';
+import { User } from '../../../MyProfile/MyProfile.slice';
+import AuthContext from '../../../../shared/context/AuthContext';
 
 
 const UpcomingMeetings: FC = () => {
 
   const state = useAppSelector(selectData);
   const dispatch = useDispatch()
+  const { user } = useContext(AuthContext)
   const isLoading = state.status === 'meetingsloading'
 
-  useEffect(() => {
-    dispatch(fetchUpcomingMeetingsAsync())
-  }, [])
+  const roleMap = {
+    [User.patient]: User.therapist.toLowerCase(),
+    [User.therapist]: User.patient.toLowerCase()
+  }
   
   return (
     <Container>
@@ -35,14 +39,24 @@ const UpcomingMeetings: FC = () => {
           count={3}
           baseColor={theme.copperBlue}
         />
-      ): state?.upcomingMeetings.map((meeting, i) => (
+      ): state?.upcomingMeetings.map((meeting: any, i) => (
         <MeetingCard key={`meeting-card-${i}`}>
           <Timeslot>
-            <p>{meeting.date}</p>
-            <p>{meeting.time}</p>
+            <p>
+              {new Date(meeting.createdAt).toLocaleDateString(undefined, {
+                month: 'short',
+                day: '2-digit',
+              })}
+            </p>
+            <p>
+              {new Date(meeting.createdAt).toLocaleTimeString(undefined, {
+                hour: 'numeric',
+                minute: '2-digit'
+              })}
+            </p>
           </Timeslot>
           <TitleCard>
-            <Title>{meeting.title}</Title>
+            <Title>{`Session with ${meeting[roleMap[User.therapist]]?.name}`}</Title>
             <Link href={meeting.meetingLink} target='_blank'>Join Now</Link>
           </TitleCard>
         </MeetingCard>
@@ -81,14 +95,15 @@ const MeetingCard = styled.div`
 
   @media (max-width: 450px) {
     width: 90%;
+    font-size: 14px;
 
     &:hover {
       width: 95%;
     }
   }
 
-  @media (min-width:451px and max-width: 768px) {
-    width: 70%;
+  @media (min-width:451px and max-width: 769px) {
+    width: 80%;
 
     &:hover {
       width: 75%;

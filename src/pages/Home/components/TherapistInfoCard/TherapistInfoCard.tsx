@@ -4,16 +4,18 @@ import { useNavigate } from 'react-router-dom'
 
 import theme from '../../../../shared/utils/theme';
 import { Button } from '../../../../shared/components';
-import { CategoryProps } from '../../HomeSlice';
+import { CategoryProps } from '../../Home.slice';
+import { ROUTES } from '../../../../shared/utils/constants';
 
 export type TherapistInfoCardProps = {
   id: string,
   name: string,
-  imageUrl: string,
-  experience: number,
-  rating: number,
-  consultationFee: number,
-  categories: CategoryProps[],
+  imageUrl?: string,
+  experience?: number,
+  rating?: number,
+  consultationFee?: number,
+  qualification?: string[],
+  categories?: any[],
 }
 
 function TherapistInfoCard({
@@ -22,18 +24,19 @@ function TherapistInfoCard({
   imageUrl,
   experience,
   rating,
+  qualification,
   consultationFee,
   categories
 }: TherapistInfoCardProps) {
 
   const navigate = useNavigate();
 
-  const cardCategories = categories.length>3
-  ? categories.slice(0, 3).map(c => c.name).concat(`+${categories.length-3} more`)
-  : categories.map(c => c.name)
+  const cardCategories = categories && categories.length>2
+  ? categories.slice(0, 2).map(c => c?.category?.name).concat(`+${categories.length-3} more`)
+  : categories?.map(c => c?.category?.name)
 
   return (
-    <Card style={{margin: 0}}>
+    <Card>
       <PictureDiv>
         {imageUrl
         ? <Avatar size={120} src={imageUrl} />
@@ -42,8 +45,8 @@ function TherapistInfoCard({
       </PictureDiv>
       <InfoDiv>
         <Info>
-          <Title>Dr. {name}</Title>
-          <SubTitle>M.A, M.Phil, Psycology</SubTitle>
+          <Title ellipsis>Dr. {name}</Title>
+          {!!qualification && qualification.map(q => <SubTitle>{q}</SubTitle>)}
           {!!experience && <SubTitle>{`${experience} years of experience`}</SubTitle>}
         </Info>
         {rating && (
@@ -51,7 +54,7 @@ function TherapistInfoCard({
         )}
       </InfoDiv>
       <CategoriesDiv>
-        {cardCategories.map((name) => (<StyledTag key={name} color='default'>{name}</StyledTag>))}
+        {cardCategories?.map((name) => (<StyledTag key={name} color='default'>{name}</StyledTag>))}
       </CategoriesDiv>
       <FooterDiv>
         <Fee>
@@ -62,7 +65,7 @@ function TherapistInfoCard({
           width={45}
           buttonFontSize={11}
           name='Book Now'
-          onClick={() => navigate('my-profile')}
+          onClick={() => navigate(`${ROUTES.MY_PROFILE}?userId=${id}`)}
         />
       </FooterDiv>
     </Card>
@@ -80,10 +83,16 @@ const Card = styled.div`
   flex-direction: column;
   justify-content: space-between;
   padding: 10px 15px;
+  margin: 0;
+  transition: all 0.5s ease;
+
+  &:hover {
+    box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
+  }
 `;
 
 const PictureDiv = styled.div`
-  height: 60%;
+  height: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -91,7 +100,7 @@ const PictureDiv = styled.div`
 `;
 
 const InfoDiv = styled.div`
-  height: 20%;
+  height: 30%;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -120,10 +129,12 @@ const FooterDiv = styled.div`
 const Info = styled.div`
   display: flex;
   flex-direction: column;
+  width: 65%;
 `;
 
 const Title = styled(Typography.Text)`
-  font-size: 20px
+  font-size: 16px;
+  text-wrap: wrap;
 `;
 
 const SubTitle = styled(Typography.Text)`
@@ -134,6 +145,7 @@ const SubTitle = styled(Typography.Text)`
 const StyledRate = styled(Rate)`
   font-size: 12px;
   margin-left: 5px;
+  width: 35%;
 `;
 
 const Fee = styled(Typography.Text)`

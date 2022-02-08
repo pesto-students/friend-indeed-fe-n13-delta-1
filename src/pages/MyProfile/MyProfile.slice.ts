@@ -1,43 +1,149 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { notification } from 'antd'
 
 import { RootState } from '../../redux/store';
 import { API } from '../../shared/utils/helper';
 
-export type Profile = {
+export enum User {
+  patient = 'Patient',
+  therapist = 'Therapist'
+}
+
+export type Therapist = {
+  id: string,
   name: string,
   email: string,
   imageUrl?: string,
+  about?: string,
+  consultationFee?: number,
+  experience?: number,
+  bookingUrl: string,
+  rating?: number,
+  onboarded?: boolean,
+  feedback?: any[],
+  categories?: any[],
+  qualification?: string[],
+  role: string,
+  createdAt?: string,
+  updatedAt?: string,
+}
+
+export type Patient = {
+  id: string,
+  name: string,
+  email: string,
+  imageUrl?: string,
+  booking?: any[],
+  feedback?: any[],
+  subscription?: any,
+  role: string,
+  active?: boolean,
+  createdAt?: string,
+  updatedAt?: string,
 }
 
 export interface ProfileState {
-  data: Profile | null;
-  status: 'idle' | 'loading' | 'failed';
+  data: Therapist & Patient | null;
+  status: 'idle' | 'therapistProfileLoading' | 'patientProfileLoading' | 'updating' | 'failed';
+  error: string | null;
+  order: any
 }
 
 const initialState: ProfileState = {
   data: null,
   status: 'idle',
+  error: null,
+  order: null
 };
 
-export const fetchProfileAsync = createAsyncThunk(
-  'profile/fetchData',
-  async () => {
-    const response = await new Promise<Profile>((resolve) =>
-      setTimeout(() => resolve({ 
-        name: "Brindavan",
-        email: "brindi@gmail.com"
-      }), 1000)
-    );
-    return response
+export const fetchTherapistProfileAsync = createAsyncThunk(
+  'therapistProfile/fetchData',
+  async (id: string, { rejectWithValue }) => {
+    try {
+      let response
+      const [{ data: therapist }, {  data: feedbacks }] = await Promise.all([
+        API.get(`/therapist/${id}`),
+        API.get(`/feedback/${id}/therapist?role=Therapist`),
+      ])
+      if(therapist.success) {
+        response = { ...therapist?.data }
+      } else {
+        return rejectWithValue(therapist?.error)
+      }
+
+      if(feedbacks.success) {
+        response = { ...response, feedback: feedbacks?.data }
+      } else {
+        return rejectWithValue(feedbacks?.error)
+      }
+      return response
+    } catch (err: any) {
+      return rejectWithValue(err?.response?.data)
+    }
+  }
+)
+
+export const updateTherapistProfileAsync = createAsyncThunk(
+  'therapistProfile/updateData',
+  async (
+    {id, input}: { id: string | undefined, input: Partial<Therapist> },
+    { rejectWithValue }
+  ) => {
+    try {
+      if(!id) throw { response: { data: 'Important info missing, please refresh' } }
+      const { data } = await API.put(`/therapist/${id}`, input)
+      if(data?.success) {
+        notification.success({ message: 'Updated details' })
+        return data?.data
+      } else {
+        notification.success({ message: data?.error })
+        return rejectWithValue(data?.error)
+      }
+    } catch (err: any) {
+      return rejectWithValue(err?.response?.data)
+    }
+  }
+)
+
+export const fetchPatientProfileAsync = createAsyncThunk(
+  'patientProfile/fetchData',
+  async (id: string, { rejectWithValue }) => {
+    try {
+      const { data } = await API.get(`/patient/${id}`)
+      if(data.success) {
+        return data?.data
+      } else {
+        return rejectWithValue(data?.error)
+      }
+    } catch (err: any) {
+      return rejectWithValue(err?.response?.data)
+    }
+  }
+)
+
+export const initiatePaymentAsync = createAsyncThunk(
+  'patientProfile/fetchData',
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await API.post(`/payment/initiate`)
+      if(data.success) {
+        return data?.data
+      } else {
+        return rejectWithValue(data?.error)
+      }
+    } catch (err: any) {
+      return rejectWithValue(err?.response?.data)
+    }
   }
 )
 
 export const uploadPhotoAsync = createAsyncThunk(
   'profile/uploadPicture',
-  async (data) => {
+  async (data: any) => {
     const response = await axios.post(`https://api.cloudinary.com/v1_1/friendindeed/image/upload`, {
-      file: {},
+      file: data,
+      upload_preset: 'msi4hdgz',
       timestamp: new Date().toLocaleDateString(),
       api_key: '437741655674911',
       signature: 'BJk-ociOBpdvGhtYgiRWegpqitU'
@@ -54,13 +160,46 @@ export const profileSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchProfileAsync.pending, (state) => {
-        state.status = 'loading';
+      .addCase(fetchTherapistProfileAsync.pending, (state) => {
+        state.status = 'therapistProfileLoading';
       })
-      .addCase(fetchProfileAsync.fulfilled, (state, action) => {
+      .addCase(fetchTherapistProfileAsync.fulfilled, (state, action) => {
         state.status = 'idle';
         state.data = action.payload;
       })
+      .addCase(fetchTherapistProfileAsync.rejected, (state, action) => {
+        state.status = 'idle'
+        state.error = String(action.payload)
+      })
+    builder
+      .addCase(updateTherapistProfileAsync.pending, (state) => {
+        state.status = 'updating'
+      })
+      .addCase(updateTherapistProfileAsync.fulfilled, (state, action) => {
+        state.status = 'idle'
+        state.data = {
+          ...action.payload,
+          feedback: state.data?.feedback,
+          categories: state.data?.categories
+        }
+      })
+      .addCase(updateTherapistProfileAsync.rejected, (state, action) => {
+        state.status = 'failed'
+        state.error = String(action.payload)
+      })
+    builder
+      .addCase(fetchPatientProfileAsync.pending, (state) => {
+        state.status = 'patientProfileLoading';
+      })
+      .addCase(fetchPatientProfileAsync.fulfilled, (state, action) => {
+        state.status = 'idle';
+        state.data = action.payload;
+      })
+      .addCase(fetchPatientProfileAsync.rejected, (state, action) => {
+        state.status = 'idle'
+        state.error = String(action.payload)
+      })
+
   },
 });
 

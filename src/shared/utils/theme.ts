@@ -3,6 +3,7 @@ export default {
   secondary: "#5C5C5C",
   copperBlue: "#073042",
   neonGreen: "#3DDC84",
+  oliveGreen: "#88A376",
   secondaryText: "#959595",
   link: "#009DFF",
   lightblue: "#EDF6FF",

@@ -22,7 +22,7 @@ export const greeter = () => {
 export const API = axios.create({
   baseURL: process.env.ENV === 'staging' ? STAGING_URL :PROD_URL,
   headers: { 
-    "access-control-allow-origin": "*",
+    "access-control-allow-origin": "http://localhost:5000",
   },
   paramsSerializer: params => stringify(params, { arrayFormat: 'brackets' })
 })
