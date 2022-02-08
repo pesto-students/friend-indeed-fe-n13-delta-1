@@ -1,18 +1,19 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import styled from 'styled-components'
-import { Menu, Avatar, Dropdown, Typography } from 'antd'
+import { Menu, Avatar, Dropdown, Typography, Button } from 'antd'
 import theme from '../utils/theme';
 import { greeter } from '../utils/helper';
-import { ROUTES } from '../utils/constants';
+import { LOGO_URL, ROUTES } from '../utils/constants';
 import { useNavigate } from 'react-router-dom';
+import AuthContext from '../context/AuthContext';
 
 const Navbar = () => {
 
   const navigate = useNavigate();
+  const { user, authenticated } = useContext(AuthContext)
 
-  const loggedIn = true
-  const logo_url = 'https://res.cloudinary.com/friendindeed/image/upload/v1642823421/FI_Logo.png'
-  const profile_url = 'https://res.cloudinary.com/practicaldev/image/fetch/s--Lt6uKVNG--/c_fill,f_auto,fl_progressive,h_320,q_auto,w_320/https://dev-to-uploads.s3.amazonaws.com/uploads/user/profile_image/322705/1412670d-03f2-4342-bf66-483956dde97a.jpeg'
+  const routeToLoginPage = () => navigate('/login')
+
   const default_profile_url = 'https://avatars.dicebear.com/api/miniavs/username-happy.svg'
 
   const menuItems = [
@@ -34,27 +35,30 @@ const Navbar = () => {
   return (
     <Container>
       <LogoArea
-        href='/dashboard'
+        href={authenticated? '/dashboard': '/'}
       >
-        <StyledAvatar size={40} shape='circle' src={logo_url} />
+        <StyledAvatar size={40} shape='circle' src={LOGO_URL} />
         <p className='logo_name'>Friend Indeed</p>
       </LogoArea>
-      {!loggedIn ? (
-        <StyledMenu mode='horizontal' theme='light'>
-          <Menu.Item>For Therapists</Menu.Item>
-          <Menu.Item>For Patients</Menu.Item>
-          <Menu.Item>Contact Us</Menu.Item>
-        </StyledMenu>
-      ) : (
+      {authenticated ? (
         <Profile>
           <Typography.Text>
             <StyledSpan>{greeter()}</StyledSpan>
-            , Joel Vinay Kumar
+            , {user.name}
           </Typography.Text>
           <StyledDropDown overlay={menu}>
-            <Avatar size={40} shape='circle' src={profile_url || default_profile_url} />
+            <Avatar size={40} shape='circle' src={user.imageUrl || default_profile_url} />
           </StyledDropDown>
         </Profile>
+      ): (
+        <>
+          <StyledMenu mode='horizontal' theme='light'>
+            <Menu.Item>For Therapists</Menu.Item>
+            <Menu.Item>For Patients</Menu.Item>
+            <Menu.Item>Contact Us</Menu.Item>
+            <Menu.Item><StyledButton onClick={routeToLoginPage}>Login</StyledButton></Menu.Item>
+          </StyledMenu>
+        </>
       )}
     </Container>
   );
@@ -94,6 +98,8 @@ const StyledAvatar = styled(Avatar)`
 
 const StyledMenu = styled(Menu)`  
   list-style-type: none;
+  background-color: transparent;
+  width: 40%;
 `;
 
 const Profile = styled.div`
@@ -108,6 +114,13 @@ const StyledSpan = styled.span`
 
 const StyledDropDown = styled(Dropdown)`
   margin-left: 10px;
+`;
+
+const StyledButton = styled(Button)`
+  background-color: ${theme.neonGreen};
+  color: ${theme.copperBlue};
+  border: 0;
+  border-radius: 30px;
 `;
 
 const StyledMenuItem = styled(Menu.Item)`
