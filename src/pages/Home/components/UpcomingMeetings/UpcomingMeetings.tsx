@@ -14,14 +14,14 @@ import AuthContext from '../../../../shared/context/AuthContext';
 const UpcomingMeetings: FC = () => {
 
   const state = useAppSelector(selectData);
-  const dispatch = useDispatch()
-  const { user } = useContext(AuthContext)
   const isLoading = state.status === 'meetingsloading'
 
   const roleMap = {
     [User.patient]: User.therapist.toLowerCase(),
     [User.therapist]: User.patient.toLowerCase()
   }
+
+  if(!state.upcomingMeetings.length) return null
   
   return (
     <Container>
@@ -73,7 +73,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-bottom: 30px;
+  padding: 30px 0;
 `;
 
 const MeetingCard = styled.div`

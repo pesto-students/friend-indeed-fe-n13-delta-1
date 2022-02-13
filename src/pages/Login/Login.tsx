@@ -1,37 +1,52 @@
-import { Button, Typography } from 'antd';
+import { Button, Typography, Select } from 'antd';
 import styled from 'styled-components';
-
+import { GoogleLogin } from 'react-google-login'
 
 import theme from '../../shared/utils/theme';
 import GoogleSvg from '../../shared/assets/google.svg'
 import { useDispatch } from 'react-redux';
-import { loginPatientAsync, loginTherapistAsync, selectData, User } from './Login.slice';
+import { selectData, User, changeLoginPersona, userLoginAsync } from './Login.slice';
 import { useAppSelector } from '../../redux/hooks';
+import { GOOGLE_CLIENTID } from '../../shared/utils/constants';
 
 function Login() {
 
   const dispatch = useDispatch()
   const state = useAppSelector(selectData)
 
-  const loginAction = () => {
-    if(state.persona === User.patient) {
-      dispatch(loginPatientAsync())
-    } else {
-      dispatch(loginTherapistAsync())
-    }
+  const loginAction = (googleData: any) => {
+    dispatch(userLoginAsync({ role: state.persona, profileObj: googleData}))
   }
 
   return (
     <Container>
       <Info>
         <CenterWrap>
-          <StyledButton
-            type='text'
-            onClick={loginAction}
+          <Select
+            placeholder='Choose a role'
+            style={{ width: '70%', marginBottom: 50 }}
+            onChange={(value) => dispatch(changeLoginPersona(value))}
           >
-            Login with Google
-            <GoogleIcon src={GoogleSvg} alt='google login' />
-          </StyledButton>
+            <Select.Option value={User.patient}>{User.patient}</Select.Option>
+            <Select.Option value={User.therapist}>{User.therapist}</Select.Option>
+          </Select>
+          <GoogleLogin
+            clientId={String(GOOGLE_CLIENTID)}
+            cookiePolicy='single_host_origin'
+            disabled={!state.persona}
+            render={(renderProps: any) => (
+              <StyledButton
+                type='text'
+                onClick={renderProps.onClick}
+                disabled={renderProps.disabled}
+              >
+                Login with Google
+                <GoogleIcon src={GoogleSvg} alt='google login' />
+              </StyledButton>
+            )}
+            onSuccess={(googleData: any) => loginAction(googleData)}
+            onFailure={() => alert("Error logging in!")}
+          />
           <Quote type='secondary' italic>
             “What mental health needs is more sunlight, more candor, and more unashamed conversation.”
             <br />– Glenn Close

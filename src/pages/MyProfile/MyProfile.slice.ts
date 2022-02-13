@@ -45,7 +45,7 @@ export type Patient = {
 
 export interface ProfileState {
   data: Therapist & Patient | null;
-  status: 'idle' | 'therapistProfileLoading' | 'patientProfileLoading' | 'updating' | 'failed';
+  status: 'idle' | 'therapistProfileLoading' | 'patientProfileLoading' | 'paymentLoading' |'updating' | 'failed';
   error: string | null;
   order: any
 }
@@ -123,10 +123,19 @@ export const fetchPatientProfileAsync = createAsyncThunk(
 )
 
 export const initiatePaymentAsync = createAsyncThunk(
-  'patientProfile/fetchData',
-  async (_, { rejectWithValue }) => {
+  'payment/initiate',
+  async (
+    input: {
+      patientId: string,
+      therapistId: string,
+      amount: number
+    },
+    { rejectWithValue }
+  ) => {
     try {
-      const { data } = await API.post(`/payment/initiate`)
+      const { data } = await API.post(`/payment`, {
+        ...input
+      })
       if(data.success) {
         return data?.data
       } else {
@@ -199,7 +208,14 @@ export const profileSlice = createSlice({
         state.status = 'idle'
         state.error = String(action.payload)
       })
-
+    builder
+      .addCase(initiatePaymentAsync.pending, (state) => {
+        state.status = 'paymentLoading'
+      })
+      .addCase(initiatePaymentAsync.fulfilled, (state, action) => {
+        state.status = 'idle'
+        state.order = action.payload
+      })
   },
 });
 

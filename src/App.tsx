@@ -39,10 +39,9 @@ function App() {
                 <Route path={ROUTES.HOME} element={<LandingPage />} />
                 <Route path={ROUTES.LOGIN} element={<Login />} />
                 <Route path={ROUTES.DASHBOARD}>
-                  <Route path={ROUTES.HOME} element={<Home />} />
-                  <Route path={ROUTES.MY_PROFILE} element={<MyProfile />} />
-                  <Route path={ROUTES.MY_SESSIONS} element={<MySessions />} />
-                  <Route path={ROUTES.PRESCRIBE_TREATMENT} element={<PrescribeTreatment />} />
+                  <Route path={ROUTES.HOME} element={<PrivateRoute><Home /></PrivateRoute>} />
+                  <Route path={ROUTES.MY_PROFILE} element={<PrivateRoute><MyProfile /></PrivateRoute>} />
+                  <Route path={ROUTES.MY_SESSIONS} element={<PrivateRoute><MySessions /></PrivateRoute>} />
                 </Route>
               </Route>
               <Route path='*' element={<NotFound />} />

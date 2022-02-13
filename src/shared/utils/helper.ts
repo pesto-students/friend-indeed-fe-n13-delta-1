@@ -19,9 +19,12 @@ export const greeter = () => {
       return 'Good Evening';
 }
 
+const token = localStorage.getItem(STORAGE_KEY_CONSTANT)
+
 export const API = axios.create({
   baseURL: process.env.ENV === 'staging' ? STAGING_URL :PROD_URL,
-  headers: { 
+  headers: {
+    Authorization: `Bearer ${token}`,
     "access-control-allow-origin": "http://localhost:5000",
   },
   paramsSerializer: params => stringify(params, { arrayFormat: 'brackets' })

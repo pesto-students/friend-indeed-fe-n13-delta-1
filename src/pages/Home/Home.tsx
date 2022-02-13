@@ -10,12 +10,12 @@ import {
   YourClients
 } from './components';
 import theme from '../../shared/utils/theme'
-import AuthContext from '../../shared/context/AuthContext'
 
 import { useAppSelector } from '../../redux/hooks';
-import { fetchPatientsAsync, fetchTherapistsAsync, fetchUpcomingMeetingsAsync, selectData } from './Home.slice';
+import { fetchPatientsAsync, fetchUpcomingMeetingsAsync, selectData } from './Home.slice';
 import { useDispatch } from 'react-redux';
 import { User } from '../MyProfile/MyProfile.slice';
+import { STORAGE_USER_CONSTANT } from '../../shared/utils/constants';
 
 
 const Home = () => {
@@ -23,14 +23,14 @@ const Home = () => {
   const dispatch = useDispatch()
   const state = useAppSelector(selectData);  
   const categoriesloading = state.status === 'categoriesloading'
-  const { user } = useContext(AuthContext)
-  const userIsTherapist = user.role === User.therapist
+  const currentUser = JSON.parse(String(localStorage.getItem(STORAGE_USER_CONSTANT)))
+  const userIsTherapist = currentUser.role === User.therapist
 
   useEffect(() => {
     if(userIsTherapist) {
       dispatch(fetchPatientsAsync())
     }
-    dispatch(fetchUpcomingMeetingsAsync({ userId: user.id, role: User.therapist }))
+    dispatch(fetchUpcomingMeetingsAsync({ userId: currentUser.id, role: User.therapist }))
   }, [])
 
   return (

@@ -1,31 +1,39 @@
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 import styled from 'styled-components'
+import { useNavigate } from 'react-router-dom';
 import { Menu, Avatar, Dropdown, Typography, Button } from 'antd'
+
 import theme from '../utils/theme';
 import { greeter } from '../utils/helper';
-import { LOGO_URL, ROUTES } from '../utils/constants';
-import { useNavigate } from 'react-router-dom';
+import { LOGO_URL, ROUTES, STORAGE_KEY_CONSTANT, STORAGE_USER_CONSTANT } from '../utils/constants';
 import AuthContext from '../context/AuthContext';
 
 const Navbar = () => {
 
   const navigate = useNavigate();
-  const { user, authenticated } = useContext(AuthContext)
+  const { authenticated } = useContext(AuthContext)
+  const currentUser = JSON.parse(String(localStorage.getItem(STORAGE_USER_CONSTANT)))  
+  const default_profile_url = 'https://avatars.dicebear.com/api/miniavs/username-happy.svg'
 
   const routeToLoginPage = () => navigate('/login')
 
-  const default_profile_url = 'https://avatars.dicebear.com/api/miniavs/username-happy.svg'
 
   const menuItems = [
-    { title: 'My Profile', route: ROUTES.MY_PROFILE },
-    { title: 'My Sessions', route: ROUTES.MY_SESSIONS },
-    { title: 'Logout', route: ROUTES.HOME }
+    { title: 'My Profile', route: () => navigate(ROUTES.MY_PROFILE) },
+    { title: 'My Sessions', route: () => navigate(ROUTES.MY_SESSIONS) },
+    { title: 'Logout',
+      route: () => {
+        localStorage.removeItem(STORAGE_USER_CONSTANT)
+        localStorage.removeItem(STORAGE_KEY_CONSTANT)
+        window.location.reload()
+      }
+    }
   ]
 
   const menu = (
     <Menu>
       {menuItems.map(item => (
-        <StyledMenuItem key={item.title} onClick={() => navigate(item.route)} >
+        <StyledMenuItem key={item.title} onClick={item.route} >
           {item.title}
         </StyledMenuItem>
       ))}
@@ -44,10 +52,10 @@ const Navbar = () => {
         <Profile>
           <Typography.Text>
             <StyledSpan>{greeter()}</StyledSpan>
-            , {user.name}
+            , {currentUser?.name}
           </Typography.Text>
           <StyledDropDown overlay={menu}>
-            <Avatar size={40} shape='circle' src={user.imageUrl || default_profile_url} />
+            <Avatar size={40} shape='circle' src={currentUser?.imageUrl || default_profile_url} />
           </StyledDropDown>
         </Profile>
       ): (

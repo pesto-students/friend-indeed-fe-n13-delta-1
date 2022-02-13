@@ -8,7 +8,7 @@ const PrivateRoute = ({ children }: { children: any }) => {
 
   const authenticated = localStorage.getItem(STORAGE_KEY_CONSTANT) && !!localStorage.getItem(STORAGE_KEY_CONSTANT)?.length
 
-  return authenticated? children: <Navigate to="/" state={{ from: location }} replace />;
+  return authenticated? children: <Navigate to="/login" state={{ from: location }} replace />;
 }
 
 export default PrivateRoute

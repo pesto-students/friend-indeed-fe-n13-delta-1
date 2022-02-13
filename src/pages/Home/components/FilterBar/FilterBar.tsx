@@ -123,7 +123,7 @@ function FilterBar() {
             dispatch(fetchTherapistsAsync({ page: state.filters.page+1 }))
             dispatch(incrementPage())
           }}
-          hasMore={!state.data.length}
+          hasMore={!state.data?.length}
           loader={<Spin />}
           endMessage={<Divider plain>End of list 🤐</Divider>}
           scrollableTarget="scrollableDiv"
@@ -140,19 +140,11 @@ function FilterBar() {
             dataSource={state.data}
             loading={therapistsLoading}
             renderItem={(info: TherapistInfoCardProps) => (
-              <List.Item style={{ display: 'flex', justifyContent: 'center' }}>
+              <List.Item key={info.id} style={{ display: 'flex', justifyContent: 'center' }}>
                 <TherapistInfoCard {...info} />
               </List.Item>
             )}
           />
-          {/* {state.data.length === 0 
-            ? <StyledEmpty description='Sorry, no therapists found. Try again.' />
-            : state.data.map((info: TherapistInfoCardProps) => (
-              <StyledCol key={info.id} span={8}>
-                <TherapistInfoCard {...info} categories={state.categories} />
-              </StyledCol>
-            ))
-          } */}
         </InfiniteScroll>
       </TherapistGrid>
     </Container>
@@ -211,8 +203,6 @@ const FilterIcon = styled(FilterFilled)`
 const TherapistGrid = styled.div`
   width: 80%;
   margin: 50px 0;
-  // display: flex;
-  // justify-content: center;
 
   @media (max-width: 450px) {
     width: 90%;

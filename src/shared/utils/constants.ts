@@ -4,6 +4,10 @@ export const STAGING_URL = 'http://localhost:5000/api/v1'
 
 export const STORAGE_KEY_CONSTANT = 'friendindeed_token'
 
+export const STORAGE_USER_CONSTANT = 'friendindeed_user'
+
+export const GOOGLE_CLIENTID = process.env.REACT_APP_GOOGLE_CLIENTID
+
 export const LOGO_URL = 'https://res.cloudinary.com/friendindeed/image/upload/v1642823421/FI_Logo.png'
 
 export const DEFAULT_PROFILE_URL = 'https://avatars.dicebear.com/api/miniavs/shreya-happy.svg'
@@ -14,8 +18,8 @@ export enum ROUTES {
   HOME = '',
   DASHBOARD = 'dashboard',
   LOGIN = 'login',
-  MY_PROFILE = 'profile',
-  MY_SESSIONS = 'sessions',
+  MY_PROFILE = 'dashboard/profile',
+  MY_SESSIONS = 'dashboard/sessions',
   PRESCRIBE_TREATMENT = 'prescribe-treatment'
 }
 

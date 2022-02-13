@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 import { RootState } from '../../redux/store';
+import { STORAGE_USER_CONSTANT } from '../../shared/utils/constants';
 import { API } from '../../shared/utils/helper';
 import { User } from '../MyProfile/MyProfile.slice';
 import { TherapistInfoCardProps } from './components/TherapistInfoCard/TherapistInfoCard';
@@ -43,6 +44,7 @@ export interface HomeState {
   upcomingMeetings: MeetingCardProps[];
   patients: Patient[];
   filters: TherapistDataFilters;
+  currentUser: any;
   status: 'idle' | 'therapistsloading' | 'categoriesloading' | 'meetingsloading' | 'patientsLoading' | 'failed';
   error: string | null;
 }
@@ -53,6 +55,7 @@ const initialState: HomeState = {
   categories: [],
   upcomingMeetings: [],
   patients: [],
+  currentUser: null,
   filters: {
     category: undefined,
     experience: undefined,
@@ -147,7 +150,11 @@ export const homeSlice = createSlice({
     },
     incrementPage: (state) => {
       state.filters.page++ 
-    }
+    },
+    getCurrentUser: (state) => {
+      const user = localStorage.getItem(STORAGE_USER_CONSTANT)
+      state.currentUser = user && JSON.parse(user)
+    },
   },
   extraReducers: (builder) => {
     builder

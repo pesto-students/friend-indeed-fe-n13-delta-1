@@ -10,12 +10,11 @@ import {
 import { UploadOutlined, EditFilled } from '@ant-design/icons'
 
 import PageHeader from '../../shared/components/PageHeader';
-import { DEFAULT_PROFILE_URL } from '../../shared/utils/constants';
+import { DEFAULT_PROFILE_URL, STORAGE_USER_CONSTANT } from '../../shared/utils/constants';
 import { Button } from '../../shared/components';
 import theme from '../../shared/utils/theme';
 import { useAppSelector } from '../../redux/hooks';
 import { fetchPatientProfileAsync, fetchTherapistProfileAsync, initiatePaymentAsync, selectData, uploadPhotoAsync, User } from './MyProfile.slice';
-import AuthContext from '../../shared/context/AuthContext';
 import { useDispatch } from 'react-redux';
 import { Link, useSearchParams } from 'react-router-dom';
 import { EditProfile } from './components';
@@ -24,9 +23,9 @@ function MyProfile() {
 
   const dispatch = useDispatch()
   const { data, order, status } = useAppSelector(selectData)
+  const currentUser = JSON.parse(String(localStorage.getItem(STORAGE_USER_CONSTANT)))
   const loading = ['therapistProfileLoading', 'patientProfileLoading'].includes(status)
-  const { user } = useContext(AuthContext)
-  const userIsTherapist: boolean = user.role === User.therapist
+  const userIsTherapist: boolean = currentUser.role === User.therapist
   const urlParams = useSearchParams()
   const therapistId: string | null = urlParams[0].get('userId')
   const patientViewsTherapist: boolean = !!therapistId && !userIsTherapist
@@ -59,34 +58,34 @@ function MyProfile() {
   }
 
   async function displayRazorpay() {
-    const res = await loadScript(
-        "https://checkout.razorpay.com/v1/checkout.js"
-    );
+    const res = await loadScript("https://checkout.razorpay.com/v1/checkout.js");
 
     if (!res) {
-        alert("Razorpay SDK failed to load. Are you online?");
-        return;
+      alert("Razorpay SDK failed to load. Are you online?");
+      return;
     }
 
-    dispatch(initiatePaymentAsync())
+    dispatch(initiatePaymentAsync({
+      patientId: currentUser.id,
+      therapistId: String(data?.id),
+      amount: Number(data?.consultationFee)
+    }))
 
     if (!order) {
-        alert("Server error. Are you online?");
-        return;
+      alert("Server error. Are you online?");
+      return;
     }
 
-    const { amount, id: order_id, currency } = order;
-
     const options = {
-        key: "rzp_test_r6FiJfddJh76SI", // Enter the Key ID generated from the Dashboard
-        amount: amount.toString(),
-        currency: currency,
+        key: "rzp_test_F0sBYBI61kGSeC", // Enter the Key ID generated from the Dashboard
+        amount: (order?.fees * 100).toString(),
+        currency: 'INR',
         name: "Friend Indeed",
         description: "Test Transaction",
-        order_id: order_id,
+        order_id: order?.orderId,
         handler: async function (response: any) {
             const data = {
-                orderCreationId: order_id,
+                orderCreationId: order?.orderId,
                 razorpayPaymentId: response.razorpay_payment_id,
                 razorpayOrderId: response.razorpay_order_id,
                 razorpaySignature: response.razorpay_signature,
@@ -99,25 +98,24 @@ function MyProfile() {
             // alert(result.data.msg);
         },
         prefill: {
-            name: user.name,
-            email: user.email,
+            name: currentUser.name,
+            email: currentUser.email,
         },
         theme: {
-            color: theme.primary,
+            color: currentUser.primary,
         },
     };
-    // @typescript-eslint/ban-ts-comment
-    // const paymentObject = new window.Razorpay(options);
-    // paymentObject.open();
+    const paymentObject = new (window as any).Razorpay(options);
+    paymentObject.open();
 }
 
   useEffect(() => {
     if(patientViewsTherapist){
       dispatch(fetchTherapistProfileAsync(String(therapistId)))
     } else if (therapistViewsSelf) {
-      dispatch(fetchTherapistProfileAsync(user.id))
+      dispatch(fetchTherapistProfileAsync(currentUser.id))
     } else {
-      dispatch(fetchPatientProfileAsync(user.id))
+      dispatch(fetchPatientProfileAsync(currentUser.id))
     }
   }, [userIsTherapist])
 
@@ -283,7 +281,9 @@ function MyProfile() {
           : (
             <CalendlyEventListener
               onDateAndTimeSelected={function (e: DateAndTimeSelectedEvent){
-                console.log(e.data.event.length > 0);
+                if(e.data.event.length > 0) {
+                  displayRazorpay()
+                }
               }}
             >
               <PopupButton
@@ -304,8 +304,8 @@ function MyProfile() {
                   cursor: 'pointer'
                 }}
                 prefill={{
-                  email: user.email,
-                  name: user.name
+                  email: currentUser.email,
+                  name: currentUser.name
                 }}
                 text={`Book a session now for ₹ ${data?.consultationFee}`}
                 url={data?.bookingUrl || ''}

@@ -1,9 +1,11 @@
 import axios from 'axios';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { useNavigate } from 'react-router-dom'
 import { notification } from 'antd'
 
 import { RootState } from '../../redux/store';
 import { API } from '../../shared/utils/helper';
+import { STORAGE_KEY_CONSTANT, STORAGE_USER_CONSTANT } from '../../shared/utils/constants';
 
 export enum User {
   patient = 'Patient',
@@ -24,15 +26,25 @@ const initialState: LoginState = {
   currentUser: null
 };
 
-export const loginTherapistAsync = createAsyncThunk(
-  'therapist/login',
-  async (_, { rejectWithValue }) => {
+export const userLoginAsync = createAsyncThunk(
+  'user/login',
+  async ({ role, profileObj }: { role: User, profileObj: any}, { rejectWithValue }) => {
     try {
-      const { data } = await API.get(`/therapist/login`)
-      if(data.success) {
-        return data?.data
-      } else {
-        return rejectWithValue(data?.error)
+      const { data } = await API.post(`/auth/login?role=${role}`, {
+        ...profileObj
+      })
+      localStorage.setItem(STORAGE_KEY_CONSTANT, data?.access_token)
+      const { data: user } = await API.get('/auth/me', {
+        headers: { Authorization: `Bearer ${data?.access_token}` }
+      })
+      localStorage.setItem(STORAGE_USER_CONSTANT, JSON.stringify({
+        ...user,
+        role,
+      }))
+      notification.success({ message: 'Successfully logged in!' })
+      return {
+        ...user,
+        role,
       }
     } catch (err: any) {
       return rejectWithValue(err?.response?.data)
@@ -40,37 +52,6 @@ export const loginTherapistAsync = createAsyncThunk(
   }
 )
 
-export const loginPatientAsync = createAsyncThunk(
-  'patient/login',
-  async (_, { rejectWithValue }) => {
-    try {
-      const { data } = await API.get(`/patient/login`)
-      if(data.success) {
-        return data?.data
-      } else {
-        return rejectWithValue(data?.error)
-      }
-    } catch (err: any) {
-      return rejectWithValue(err?.response?.data)
-    }
-  }
-)
-
-export const initiatePaymentAsync = createAsyncThunk(
-  'patientProfile/fetchData',
-  async (_, { rejectWithValue }) => {
-    try {
-      const { data } = await API.post(`/payment/initiate`)
-      if(data.success) {
-        return data?.data
-      } else {
-        return rejectWithValue(data?.error)
-      }
-    } catch (err: any) {
-      return rejectWithValue(err?.response?.data)
-    }
-  }
-)
 
 export const loginSlice = createSlice({
   name: 'login',
@@ -82,31 +63,22 @@ export const loginSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(loginPatientAsync.pending, (state) => {
-        state.status = 'loading';
-      })
-      .addCase(loginPatientAsync.fulfilled, (state, action) => {
-        state.status = 'idle';
-        state.currentUser = action.payload;
-      })
-      .addCase(loginPatientAsync.rejected, (state, action) => {
-        state.status = 'idle'
-        state.error = String(action.payload)
-      })
-    builder
-      .addCase(loginTherapistAsync.pending, (state) => {
+      .addCase(userLoginAsync.pending, (state) => {
         state.status = 'loading'
       })
-      .addCase(loginTherapistAsync.fulfilled, (state, action) => {
+      .addCase(userLoginAsync.fulfilled, (state, action) => {
         state.status = 'idle'
         state.currentUser = action.payload
+        window.location.href = '/dashboard'
       })
-      .addCase(loginTherapistAsync.rejected, (state, action) => {
+      .addCase(userLoginAsync.rejected, (state, action) => {
         state.status = 'failed'
         state.error = String(action.payload)
       })
   },
 });
+
+export const { changeLoginPersona } = loginSlice.actions
 
 export const selectData = (state: RootState) => state.auth;
 
