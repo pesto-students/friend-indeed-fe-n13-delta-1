@@ -163,7 +163,7 @@ export const homeSlice = createSlice({
       })
       .addCase(fetchTherapistsAsync.fulfilled, (state, action) => {
         state.status = 'idle';
-        state.data = state.data.concat(action.payload?.data?.data);
+        state.data = action.payload?.data?.data;
         state.dataCount = action.payload?.count
       })
       .addCase(fetchTherapistsAsync.rejected, (state, action) => {

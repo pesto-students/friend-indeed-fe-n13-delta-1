@@ -55,7 +55,6 @@ const Container = styled.div`
   @media (max-width: 768px) {
     padding: 20px 50px;
   }
-
   
 `;
 
@@ -65,6 +64,10 @@ const CenterWrap = styled.div`
   justify-content: center;
   align-items: flex-start;
   width: 90%;
+
+  @media (max-width: 450px) {
+    width: 100%;
+  }
 `;
 
 const Info = styled.div`

@@ -2,10 +2,11 @@ import axios from 'axios'
 import { stringify } from 'qs'
 import { notification } from 'antd'
 
-import { PROD_URL, STAGING_URL, STORAGE_KEY_CONSTANT } from './constants';
+import { PROD_URL, STAGING_URL, STORAGE_KEY_CONSTANT, STORAGE_USER_CONSTANT } from './constants';
 
 export const Logout = () => {
   localStorage.removeItem(STORAGE_KEY_CONSTANT)
+  localStorage.removeItem(STORAGE_USER_CONSTANT)
 }
 
 export const greeter = () => {

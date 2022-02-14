@@ -18,8 +18,8 @@ export enum ROUTES {
   HOME = '',
   DASHBOARD = 'dashboard',
   LOGIN = 'login',
-  MY_PROFILE = 'dashboard/profile',
-  MY_SESSIONS = 'dashboard/sessions',
+  MY_PROFILE = 'profile',
+  MY_SESSIONS = 'sessions',
   PRESCRIBE_TREATMENT = 'prescribe-treatment'
 }
 

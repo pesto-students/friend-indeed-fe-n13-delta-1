@@ -123,7 +123,7 @@ function FilterBar() {
             dispatch(fetchTherapistsAsync({ page: state.filters.page+1 }))
             dispatch(incrementPage())
           }}
-          hasMore={!state.data?.length}
+          hasMore={state.data?.length < state.dataCount}
           loader={<Spin />}
           endMessage={<Divider plain>End of list 🤐</Divider>}
           scrollableTarget="scrollableDiv"

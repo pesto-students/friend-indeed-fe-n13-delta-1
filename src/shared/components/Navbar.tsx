@@ -19,8 +19,8 @@ const Navbar = () => {
 
 
   const menuItems = [
-    { title: 'My Profile', route: () => navigate(ROUTES.MY_PROFILE) },
-    { title: 'My Sessions', route: () => navigate(ROUTES.MY_SESSIONS) },
+    { title: 'My Profile', route: () => navigate(`${ROUTES.DASHBOARD}/${ROUTES.MY_PROFILE}`) },
+    { title: 'My Sessions', route: () => navigate(`${ROUTES.DASHBOARD}/${ROUTES.MY_SESSIONS}`) },
     { title: 'Logout',
       route: () => {
         localStorage.removeItem(STORAGE_USER_CONSTANT)

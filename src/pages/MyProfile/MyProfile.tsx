@@ -234,11 +234,11 @@ function MyProfile() {
               />
             </StyledAntSkeleton>
           )}
-          <StyledAntSkeleton loading={loading} active={loading}>
+          {/* <StyledAntSkeleton loading={loading} active={loading}>
             {patientViewsSelf && (
               <Title level={2} style={{ color: theme.copperBlue }}>Subscriptions</Title>
             )}
-          </StyledAntSkeleton>
+          </StyledAntSkeleton> */}
         </InfoColumn>
         <ActionsColumn span={7}>
           {loading
