@@ -1,66 +1,89 @@
-import React, { useCallback, useState } from 'react';
-import styled from 'styled-components'
-import Skeleton from 'react-loading-skeleton'
-import { Typography, Input, Image, Tag } from 'antd'
-import { SearchOutlined } from '@ant-design/icons'
-import { debounce } from 'lodash'
+import React, { useCallback, useState } from "react"
+import styled from "styled-components"
+import Skeleton from "react-loading-skeleton"
+import { Typography, Input, Image, Tag, Avatar } from "antd"
+import { SearchOutlined } from "@ant-design/icons"
+import { debounce } from "lodash"
 
-import theme from '../../../../shared/utils/theme';
-import { Button } from '../../../../shared/components';
-import { useAppSelector } from '../../../../redux/hooks';
-import { fetchPatientsAsync, Patient, selectData } from '../../Home.slice';
-import { useDispatch } from 'react-redux';
+import theme from "../../../../shared/utils/theme"
+import { Button } from "../../../../shared/components"
+import { useAppSelector } from "../../../../redux/hooks"
+import { fetchPatientsAsync, Patient, selectData } from "../../Home.slice"
+import { useDispatch } from "react-redux"
+import { Modal} from 'antd';
 
 type PatientCardProps = {
-  id: string,
-  name: string,
-  imageUrl: string,
-  date: string,
-  categories: any[],
+  id: string
+  name: string
+  imageUrl: string
+  date: string
+  categories: any[]
 }
 
 const PatientCard = ({ id, name, imageUrl, date, categories }: PatientCardProps) => {
-
+  const [visible, setVisible] = useState(false);
   return (
     <PatientCardContainer>
       <Picture src={imageUrl} />
       <InfoArea>
         <Typography.Title level={5}>{name}</Typography.Title>
         <p>{`Last session: ${date}`}</p>
-        <>{categories.map((name) => (<StyledTag key={name} color='default'>{name}</StyledTag>))}</>
+        <>
+          {categories.map((name) => (
+            <StyledTag key={name} color="default">
+              {name}
+            </StyledTag>
+          ))}
+        </>
       </InfoArea>
       <ActionsArea>
         <Button
-          name='View Past Sessions'
+          name="View Past Sessions"
           onClick={() => null}
           width={100}
           height={30}
           buttonFontSize={12}
         />
         <Button
-          name='Prescribe Treatment'
-          onClick={() => null}
+          name="Prescribe Treatment"
+          onClick={() => setVisible(true)}
           width={100}
           height={30}
           buttonFontSize={12}
         />
+        <Modal
+          title="Prescribe Treatment"
+          centered
+          visible={visible}
+          onOk={() => setVisible(false)}
+          onCancel={() => setVisible(false)}
+          width={700}
+        >
+          <PatientCardContainer>
+          <Avatar src={imageUrl} size={50} />
+          <InfoArea>
+          <Typography.Title level={5}>Session with {name}</Typography.Title>
+          </InfoArea>
+          </PatientCardContainer>
+          <p>some contents...</p>
+          <p>some contents...</p>
+        </Modal>
       </ActionsArea>
     </PatientCardContainer>
   )
 }
 
 function YourClients() {
-
   const dispatch = useDispatch()
   const state = useAppSelector(selectData)
-  const isLoading = state.status === 'patientsLoading'
+  const isLoading = state.status === "patientsLoading"
 
-  const [name, setName] = useState('')
+  const [name, setName] = useState("")
 
   const searchCallback = useCallback(
-    debounce(query => dispatch(fetchPatientsAsync(query)), 400),
+    debounce((query) => dispatch(fetchPatientsAsync(query)), 400),
     []
-  );
+  )
 
   return (
     <Container>
@@ -70,27 +93,31 @@ function YourClients() {
       >
         Your Clients
       </Typography.Title>
-      <SearchBar allowClear placeholder={`I'm looking for...`} suffix={<SearchOutlined />} />
+      <SearchBar
+        allowClear
+        placeholder={`I'm looking for...`}
+        suffix={<SearchOutlined />}
+      />
       {isLoading
-      ? (
-        Array(3).fill(0).map((_, i) => (
-          <Skeleton
-            key={`loader-${i}`}
-            width='60vw'
-            height={120}
-            borderRadius={20}
-            style={{ marginBottom: 20 }}
-          />
-        ))
-      ) 
-      : state.patients.map((user: Patient) => (
-        <PatientCard key={`user-${user.name}}`} {...user} />
-      ))}
+        ? Array(3)
+            .fill(0)
+            .map((_, i) => (
+              <Skeleton
+                key={`loader-${i}`}
+                width="60vw"
+                height={120}
+                borderRadius={20}
+                style={{ marginBottom: 20 }}
+              />
+            ))
+        : state.patients.map((user: Patient) => (
+            <PatientCard key={`user-${user.name}}`} {...user} />
+          ))}
     </Container>
-  );
+  )
 }
 
-export default YourClients;
+export default YourClients
 
 const Container = styled.div`
   display: flex;
@@ -99,7 +126,7 @@ const Container = styled.div`
   padding-bottom: 30px;
   width: 100%;
   height: 100%;
-`;
+`
 
 const SearchBar = styled(Input)`
   border-radius: 20px;
@@ -108,7 +135,7 @@ const SearchBar = styled(Input)`
   height: 100%;
   font-family: DM Sans;
   margin-bottom: 20px;
-`;
+`
 
 const PatientCardContainer = styled.div`
   width: 60%;
@@ -119,20 +146,21 @@ const PatientCardContainer = styled.div`
   background-color: ${theme.lightblue};
   display: flex;
   align-items: center;
-`;
+`
 
 const Picture = styled(Image)<{ src: string }>`
   width: 110px;
   height: 110px;
   border-radius: 20px;
-  background: ${theme.lightblue} url("${props => props.src}") no-repeat fixed center;
+  background: ${theme.lightblue} url("${(props) => props.src}") no-repeat fixed
+    center;
   box-shadow: 0 3px 10px rgb(0 0 0 / 0.3);
   margin-right: 20px;
 
   $:hover {
     opacity: 0.9;
   }
-`;
+`
 
 const InfoArea = styled.div`
   disply: flex;
@@ -140,7 +168,7 @@ const InfoArea = styled.div`
   justify-content: space-between;
   align-items: space-between;
   width: 70%;
-`;
+`
 
 const StyledTag = styled(Tag)`
   background-color: ${theme.chip};
@@ -149,11 +177,11 @@ const StyledTag = styled(Tag)`
   padding: 2px 10px;
   margin-top: 10px;
   border: 0;
-`;
+`
 
 const ActionsArea = styled.div`
   height: 80px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-`;
+`

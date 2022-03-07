@@ -134,7 +134,18 @@ export const fetchPatientsAsync = createAsyncThunk(
             'Depression',
             'Anxiety'
           ]
-        }
+        },
+        {
+          id: 'h24gbb42ikn',
+          name: 'Rahul',
+          imageUrl: 'https://res.cloudinary.com/practicaldev/image/fetch/s--Lt6uKVNG--/c_fill,f_auto,fl_progressive,h_320,q_auto,w_320/https://dev-to-uploads.s3.amazonaws.com/uploads/user/profile_image/322705/1412670d-03f2-4342-bf66-483956dde97a.jpeg',
+          date: new Date('13 February, 2022').toUTCString(),
+          categories: [
+            'Depression',
+            'Anxiety'
+          ]
+        },
+        
       ]), 1000)
     );
     return response
