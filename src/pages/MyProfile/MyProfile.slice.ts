@@ -147,6 +147,27 @@ export const initiatePaymentAsync = createAsyncThunk(
   }
 )
 
+export const completePaymentAsync = createAsyncThunk(
+  'payment/complete',
+  async (
+    input: any,
+    { rejectWithValue }
+  ) => {
+    try {
+      const { data } = await API.post(`/payment/verification`, {
+        ...input
+      })
+      if(data.success) {
+        return data?.data
+      } else {
+        return rejectWithValue(data?.error)
+      }
+    } catch (err: any) {
+      return rejectWithValue(err?.response?.data)
+    }
+  }
+)
+
 export const uploadPhotoAsync = createAsyncThunk(
   'profile/uploadPicture',
   async (data: any) => {
@@ -189,7 +210,6 @@ export const profileSlice = createSlice({
         state.data = {
           ...action.payload,
           feedback: state.data?.feedback,
-          categories: state.data?.categories
         }
       })
       .addCase(updateTherapistProfileAsync.rejected, (state, action) => {
@@ -215,6 +235,13 @@ export const profileSlice = createSlice({
       .addCase(initiatePaymentAsync.fulfilled, (state, action) => {
         state.status = 'idle'
         state.order = action.payload
+      })
+    builder
+      .addCase(completePaymentAsync.pending, (state) => {
+        state.status = 'paymentLoading'
+      })
+      .addCase(completePaymentAsync.fulfilled, (state) => {
+        state.status = 'idle'
       })
   },
 });

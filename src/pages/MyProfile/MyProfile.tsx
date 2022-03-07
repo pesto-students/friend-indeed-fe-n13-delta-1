@@ -1,11 +1,10 @@
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import Skeleton from 'react-loading-skeleton';
 import { CalendlyEventListener, DateAndTimeSelectedEvent, PopupButton } from 'react-calendly'
 import {
   Row, Col, Image, Typography, List, Comment, Rate,
-  Modal, Popconfirm, Skeleton as AntSkeleton, Input,
-  Upload, Popover, notification, Tag
+  Popconfirm, Skeleton as AntSkeleton, Upload, Tag
 } from 'antd'
 import { UploadOutlined, EditFilled } from '@ant-design/icons'
 
@@ -14,12 +13,17 @@ import { DEFAULT_PROFILE_URL, STORAGE_USER_CONSTANT } from '../../shared/utils/c
 import { Button } from '../../shared/components';
 import theme from '../../shared/utils/theme';
 import { useAppSelector } from '../../redux/hooks';
-import { fetchPatientProfileAsync, fetchTherapistProfileAsync, initiatePaymentAsync, selectData, uploadPhotoAsync, User } from './MyProfile.slice';
+import { completePaymentAsync, fetchPatientProfileAsync, fetchTherapistProfileAsync, initiatePaymentAsync, selectData, uploadPhotoAsync, User } from './MyProfile.slice';
 import { useDispatch } from 'react-redux';
 import { Link, useSearchParams } from 'react-router-dom';
-import { EditProfile } from './components';
+import { EditProfile, Feedback } from './components';
 
 function MyProfile() {
+
+  const modalStyles = {
+    okButtonProps: { style: { fontFamily: 'DM Sans', borderRadius: '20px' } },
+    cancelButtonProps: { style: { fontFamily: 'DM Sans', borderRadius: '20px' } }
+  }
 
   const dispatch = useDispatch()
   const { data, order, status } = useAppSelector(selectData)
@@ -28,20 +32,17 @@ function MyProfile() {
   const userIsTherapist: boolean = currentUser.role === User.therapist
   const urlParams = useSearchParams()
   const therapistId: string | null = urlParams[0].get('userId')
+  const editProfile = Boolean(urlParams[0].get('edit-profile'))
   const patientViewsTherapist: boolean = !!therapistId && !userIsTherapist
   const patientViewsSelf: boolean = !therapistId && !userIsTherapist
   const therapistViewsSelf: boolean = !therapistId && userIsTherapist
 
   const [openFeedbackModal, setOpenFeedbackModal] = useState(false)
-  const [openEditForm, setOpenEditForm] = useState(false)
+  const [openEditForm, setOpenEditForm] = useState(false || editProfile)
 
   const openModal = () => setOpenFeedbackModal(true)
   const closeModal = () => setOpenFeedbackModal(false)
   const closeDrawer = () => setOpenEditForm(false)
-  const modalStyles = {
-    okButtonProps: { style: { fontFamily: 'DM Sans', borderRadius: '20px' } },
-    cancelButtonProps: { style: { fontFamily: 'DM Sans', borderRadius: '20px' } }
-  }
 
   function loadScript(src: string) {
     return new Promise((resolve) => {
@@ -81,7 +82,7 @@ function MyProfile() {
         amount: (order?.fees * 100).toString(),
         currency: 'INR',
         name: "Friend Indeed",
-        description: "Test Transaction",
+        description: `Book your session @ ${order?.fees}`,
         order_id: order?.orderId,
         handler: async function (response: any) {
             const data = {
@@ -91,18 +92,14 @@ function MyProfile() {
                 razorpaySignature: response.razorpay_signature,
             };
 
-            console.log(response)
-
-            // const result = await axios.post("http://localhost:5000/payment/success", data);
-
-            // alert(result.data.msg);
+            dispatch(completePaymentAsync(data))
         },
         prefill: {
-            name: currentUser.name,
-            email: currentUser.email,
+          name: currentUser.name,
+          email: currentUser.email,
         },
         theme: {
-            color: currentUser.primary,
+          color: currentUser.primary,
         },
     };
     const paymentObject = new (window as any).Razorpay(options);
@@ -110,7 +107,7 @@ function MyProfile() {
 }
 
   useEffect(() => {
-    if(patientViewsTherapist){
+    if(patientViewsTherapist || editProfile){
       dispatch(fetchTherapistProfileAsync(String(therapistId)))
     } else if (therapistViewsSelf) {
       dispatch(fetchTherapistProfileAsync(currentUser.id))
@@ -121,7 +118,7 @@ function MyProfile() {
 
   return (
     <Container>
-      <PageHeader title='My Profile' />
+      <PageHeader title={(patientViewsTherapist || editProfile)? 'Doctor\'s Profile':'My Profile'} />
       <SubContainer>
         <ProfileColumn span={6}>
           {loading
@@ -203,7 +200,15 @@ function MyProfile() {
           </StyledAntSkeleton>
           {data?.feedback && (
             <StyledAntSkeleton loading={loading} active={loading}>
-              <Title level={2} style={{ color: theme.copperBlue }}>Feedback/Rating</Title>
+              <Title level={2} style={{ color: theme.copperBlue, display: 'flex' }}>
+                Feedback/Rating
+                <Button
+                  name='Add'
+                  width={10}
+                  // height={30}
+                  onClick={() => setOpenFeedbackModal(true)}
+                />
+              </Title>
               <List
                 header={`${data?.feedback?.length || 0} ratings`}
                 itemLayout='horizontal'
@@ -234,11 +239,6 @@ function MyProfile() {
               />
             </StyledAntSkeleton>
           )}
-          {/* <StyledAntSkeleton loading={loading} active={loading}>
-            {patientViewsSelf && (
-              <Title level={2} style={{ color: theme.copperBlue }}>Subscriptions</Title>
-            )}
-          </StyledAntSkeleton> */}
         </InfoColumn>
         <ActionsColumn span={7}>
           {loading
@@ -260,7 +260,7 @@ function MyProfile() {
               </TagsArea>
             </>
           )
-          : (therapistViewsSelf || patientViewsSelf)
+          : (therapistViewsSelf || patientViewsSelf || editProfile)
           ? (
             <>
               <StyledButton
@@ -273,7 +273,7 @@ function MyProfile() {
               />
               {data?.categories && (
                 <TagsArea>
-                  { data?.categories.map(c => <StyledTag>{c?.category?.name}</StyledTag>)}
+                  {data?.categories.map(c => <StyledTag>{c?.category?.name}</StyledTag>)}
                 </TagsArea>
               )}
             </>
@@ -307,7 +307,11 @@ function MyProfile() {
                   email: currentUser.email,
                   name: currentUser.name
                 }}
-                text={`Book a session now for ₹ ${data?.consultationFee}`}
+                text={
+                  data?.consultationFee
+                    ? `Book a session now for ₹ ${data?.consultationFee}`
+                    : `Fee missing in profile`
+                  }
                 url={data?.bookingUrl || ''}
               />
             </CalendlyEventListener>
@@ -315,13 +319,9 @@ function MyProfile() {
         </ActionsColumn>
       </SubContainer>
       {openFeedbackModal && (
-        <Modal
-          closable
-          visible={openFeedbackModal}
-          title='Edit Feedback'
-          okText='Update'
-          onCancel={closeModal}
-          {...modalStyles}
+        <Feedback
+          open={openFeedbackModal}
+          closeModal={closeModal}
         />
       )}
       {openEditForm && (

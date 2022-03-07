@@ -1,7 +1,7 @@
-import React, { useCallback, useState } from 'react';
+import { useCallback, useEffect } from 'react';
 import styled from 'styled-components'
 import Skeleton from 'react-loading-skeleton'
-import { Typography, Input, Image, Tag } from 'antd'
+import { Typography, Input, Image, Tag, List } from 'antd'
 import { SearchOutlined } from '@ant-design/icons'
 import { debounce } from 'lodash'
 
@@ -55,12 +55,14 @@ function YourClients() {
   const state = useAppSelector(selectData)
   const isLoading = state.status === 'patientsLoading'
 
-  const [name, setName] = useState('')
-
-  const searchCallback = useCallback(
-    debounce(query => dispatch(fetchPatientsAsync(query)), 400),
+  const handleSearch = useCallback(
+    debounce(query => dispatch(fetchPatientsAsync(query)), 500),
     []
   );
+
+  useEffect(() => {
+    fetchPatientsAsync('')
+  }, [])
 
   return (
     <Container>
@@ -70,7 +72,12 @@ function YourClients() {
       >
         Your Clients
       </Typography.Title>
-      <SearchBar allowClear placeholder={`I'm looking for...`} suffix={<SearchOutlined />} />
+      <SearchBar
+        allowClear
+        onChange={e => handleSearch(e.target.value)}
+        placeholder={`I'm looking for...`}
+        suffix={<SearchOutlined />}
+      />
       {isLoading
       ? (
         Array(3).fill(0).map((_, i) => (
@@ -83,9 +90,20 @@ function YourClients() {
           />
         ))
       ) 
-      : state.patients.map((user: Patient) => (
+      : (
+        <List
+          dataSource={state.patients}
+          rowKey={p => p.id}
+          renderItem={(user: Patient) => (
+            <List.Item>
+              <PatientCard key={`user-${user.name}}`} {...user} />
+            </List.Item>
+          )}
+        />
+      )}
+      {/* : state.patients.map((user: Patient) => (
         <PatientCard key={`user-${user.name}}`} {...user} />
-      ))}
+      ))} */}
     </Container>
   );
 }
@@ -98,7 +116,7 @@ const Container = styled.div`
   align-items: center;
   padding-bottom: 30px;
   width: 100%;
-  height: 100%;
+  min-height: 60vh;
 `;
 
 const SearchBar = styled(Input)`

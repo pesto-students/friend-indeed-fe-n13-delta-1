@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { Drawer, Form, Input, Select, notification } from 'antd'
 
 import { Button } from '../../../../shared/components'
@@ -26,6 +26,9 @@ function EditProfile({
   const { categories } = useAppSelector(selectData)
   const { status } = useAppSelector(selectProfile)
 
+  console.log(user);
+  
+
   let initialValues: any = {
     name: user?.name,
     email: user?.email,
@@ -35,6 +38,8 @@ function EditProfile({
     initialValues = {
       ...initialValues,
       ...user,
+      consultationFee: parseInt(initialValues.consultationFee),
+      experience: parseInt(initialValues.experience),
       categories: user?.categories?.map(c => c?.category?.name)
     }
   }
@@ -42,8 +47,10 @@ function EditProfile({
   const handleSubmit = async (values: any) => {
     try {
       if(userIsTherapist) {
-        const { categories, ...restInput } = values
-        dispatch(updateTherapistProfileAsync({ id: user?.id, input: restInput }))
+        dispatch(updateTherapistProfileAsync({
+          id: user?.id,
+          input: values
+        }))
       }
     } catch (e: any) {
       notification.error({ message: e.message })
@@ -87,7 +94,7 @@ function EditProfile({
                 placeholder='Select categories'
               >
                 {categories.map(({ id, name }) => (
-                  <StyledSelect.Option value={name} key={id}>{name}</StyledSelect.Option>
+                  <StyledSelect.Option value={id} key={id}>{name}</StyledSelect.Option>
                 ))}
               </StyledSelect>
             </Form.Item>

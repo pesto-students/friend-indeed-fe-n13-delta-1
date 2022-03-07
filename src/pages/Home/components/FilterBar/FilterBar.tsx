@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components'
 import { Row, Col, Select, Input, Typography, Empty, Divider, List, Spin } from 'antd'
 import { SearchOutlined, FilterFilled } from '@ant-design/icons'
-import Skeleton from 'react-loading-skeleton'
+import { debounce } from 'lodash'
 import InfiniteScroll from 'react-infinite-scroll-component'
 
 import { Button } from '../../../../shared/components';
@@ -34,8 +34,17 @@ function FilterBar() {
   const [fee, setFee] = useState<any>('');
   const [experience, setExperience] = useState<any>('');
 
+  const handleSearch = useCallback(
+    debounce(query => dispatch(fetchTherapistsAsync({ name: query, page: 1 })), 500),
+    []
+  );
+
   useEffect(() => {
     dispatch(fetchCategoriesAsync())
+
+    return () => {
+      handleSearch.cancel()
+    }
   }, [])
 
   useEffect(() => {
@@ -62,6 +71,7 @@ function FilterBar() {
             <StyledSelect
               placeholder='Rating'
               onChange={value => setRating(value)}
+              style={{ borderRadius: 5 }}
             >
               {ratingsOptions.map(({ label, value }) => (
                 <Option value={value}>
@@ -97,7 +107,12 @@ function FilterBar() {
         </StyledRow>
         <StyledRow gutter={[16, 24]}>
           <Col xs={24} lg={15}>
-            <Input placeholder='Search therapists by name...' suffix={<SearchIcon />} />
+            <Input
+              allowClear
+              onChange={e => handleSearch(e.target.value)}
+              placeholder='Search therapists by name...'
+              suffix={<SearchIcon />}
+            />
           </Col>
           <Col xs={24} lg={6}>
             <Button

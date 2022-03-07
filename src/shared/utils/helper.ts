@@ -7,17 +7,18 @@ import { PROD_URL, STAGING_URL, STORAGE_KEY_CONSTANT, STORAGE_USER_CONSTANT } fr
 export const Logout = () => {
   localStorage.removeItem(STORAGE_KEY_CONSTANT)
   localStorage.removeItem(STORAGE_USER_CONSTANT)
+  window.location.href = '/login'
 }
 
 export const greeter = () => {
   const now = new Date().getHours();
 
   if (now < 12)
-      return 'Good Morning';
+    return 'Good Morning';
   else if (now >= 12 && now <= 17)
-      return 'Good Afternoon';
+    return 'Good Afternoon';
   else if (now >= 17 && now <= 24)
-      return 'Good Evening';
+    return 'Good Evening';
 }
 
 const token = localStorage.getItem(STORAGE_KEY_CONSTANT)

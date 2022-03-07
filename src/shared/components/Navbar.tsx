@@ -1,6 +1,7 @@
 import { useContext } from 'react';
 import styled from 'styled-components'
 import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-scroll'
 import { Menu, Avatar, Dropdown, Typography, Button } from 'antd'
 
 import theme from '../utils/theme';
@@ -32,8 +33,8 @@ const Navbar = () => {
 
   const menu = (
     <Menu>
-      {menuItems.map(item => (
-        <StyledMenuItem key={item.title} onClick={item.route} >
+      {menuItems.map((item, i) => (
+        <StyledMenuItem key={`${item.title}-${i}`} onClick={item.route} >
           {item.title}
         </StyledMenuItem>
       ))}
@@ -61,10 +62,10 @@ const Navbar = () => {
       ): (
         <>
           <StyledMenu mode='horizontal' theme='light'>
-            <Menu.Item>For Therapists</Menu.Item>
-            <Menu.Item>For Patients</Menu.Item>
-            <Menu.Item>Contact Us</Menu.Item>
-            <Menu.Item><StyledButton onClick={routeToLoginPage}>Login</StyledButton></Menu.Item>
+            <Menu.Item key='therapist'><Link to='ForTherapists' spy smooth>For Therapists</Link></Menu.Item>
+            <Menu.Item key='patient'>For Patients</Menu.Item>
+            <Menu.Item key='contact'>Contact Us</Menu.Item>
+            <Menu.Item key='login'><StyledButton onClick={routeToLoginPage}>Login</StyledButton></Menu.Item>
           </StyledMenu>
         </>
       )}
@@ -108,6 +109,8 @@ const StyledMenu = styled(Menu)`
   list-style-type: none;
   background-color: transparent;
   width: 40%;
+  display: flex;
+  justify-content: flex-end;
 `;
 
 const Profile = styled.div`

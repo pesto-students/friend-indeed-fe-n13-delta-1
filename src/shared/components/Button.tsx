@@ -50,10 +50,10 @@ const StyledBtn = styled(Btn)<{ width: number, height?: number }>`
   justify-content: center;
 
 
-  // &:hover {
-  //   background-color: rgba(7, 48, 66, 0.6);
-  //   border: 0;
-  // }
+  &:hover {
+    background-color: rgba(7, 48, 66, 0.6);
+    border: 0;
+  }
 
   &:active {
     background-color: rgba(7, 48, 66, 0.6);

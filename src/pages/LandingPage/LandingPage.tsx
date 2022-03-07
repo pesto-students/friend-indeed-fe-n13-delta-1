@@ -17,11 +17,11 @@ function LandingPage() {
       <Container>
         <Info>
           <CenterWrap>
-            <Typography.Title level={1}>
+            <Typography.Title level={1} style={{ fontSize: 50 }}>
               Make your <br/>mental health<br/>top priority
             </Typography.Title>
-            <Typography.Title level={3} type='secondary' style={{ marginBottom: 30 }}>
-              Hey friend, we're here to help you
+            <Typography.Title level={3} type='secondary' style={{ marginBottom: 30, width: '60%' }}>
+              Consult experienced therapists from your home at ease.
             </Typography.Title>
             <ButtonGroup>
               <Button name='Learn More' onClick={() => null} width={45} height={30} />
@@ -32,6 +32,7 @@ function LandingPage() {
         <Hero src={require( '../../shared/assets/Home-Hero.png')} alt='Hero image' />
       </Container>
       <HowToBook />
+      <div id="ForTherapists" style={{ height: 500 }} />
     </>
   );
 }

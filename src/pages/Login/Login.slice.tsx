@@ -1,6 +1,4 @@
-import axios from 'axios';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { useNavigate } from 'react-router-dom'
 import { notification } from 'antd'
 
 import { RootState } from '../../redux/store';
@@ -9,7 +7,8 @@ import { STORAGE_KEY_CONSTANT, STORAGE_USER_CONSTANT } from '../../shared/utils/
 
 export enum User {
   patient = 'Patient',
-  therapist = 'Therapist'
+  therapist = 'Therapist',
+  none = ''
 }
 
 export interface LoginState {
@@ -20,7 +19,7 @@ export interface LoginState {
 }
 
 const initialState: LoginState = {
-  persona: User.patient,
+  persona: User.none,
   status: 'idle',
   error: null,
   currentUser: null

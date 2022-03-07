@@ -33,7 +33,7 @@ function Login() {
           <GoogleLogin
             clientId={String(GOOGLE_CLIENTID)}
             cookiePolicy='single_host_origin'
-            disabled={!state.persona}
+            disabled={state.persona === ''}
             render={(renderProps: any) => (
               <StyledButton
                 type='text'

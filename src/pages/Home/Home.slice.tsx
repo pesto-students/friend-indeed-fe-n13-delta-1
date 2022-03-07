@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 import { RootState } from '../../redux/store';
-import { STORAGE_USER_CONSTANT } from '../../shared/utils/constants';
+import { STORAGE_KEY_CONSTANT, STORAGE_USER_CONSTANT } from '../../shared/utils/constants';
 import { API } from '../../shared/utils/helper';
 import { User } from '../MyProfile/MyProfile.slice';
 import { TherapistInfoCardProps } from './components/TherapistInfoCard/TherapistInfoCard';
@@ -26,7 +26,8 @@ export type TherapistDataFilters = {
   experience?: number,
   rating?: number,
   fee?: number,
-  page: number
+  page: number,
+  name?: string,
 }
 
 export type Patient = {
@@ -61,7 +62,8 @@ const initialState: HomeState = {
     experience: undefined,
     rating: undefined,
     fee: undefined,
-    page: 1
+    page: 1,
+    name: ''
   },
   status: 'idle',
   error: null,
@@ -122,22 +124,20 @@ export const fetchUpcomingMeetingsAsync = createAsyncThunk(
 
 export const fetchPatientsAsync = createAsyncThunk(
   'patients/fetchData',
-  async (query?: string) => {
-    const response = await new Promise<Patient[]>((resolve) =>
-    setTimeout(() => resolve([
-        {
-          id: 'h24gbb42ikn',
-          name: 'Hruday',
-          imageUrl: 'https://res.cloudinary.com/practicaldev/image/fetch/s--Lt6uKVNG--/c_fill,f_auto,fl_progressive,h_320,q_auto,w_320/https://dev-to-uploads.s3.amazonaws.com/uploads/user/profile_image/322705/1412670d-03f2-4342-bf66-483956dde97a.jpeg',
-          date: new Date('13 February, 2022').toUTCString(),
-          categories: [
-            'Depression',
-            'Anxiety'
-          ]
-        }
-      ]), 1000)
-    );
-    return response
+  async (patientName: string, { rejectWithValue }) => {
+    try {
+      const currentUser = JSON.parse(String(localStorage.getItem(STORAGE_USER_CONSTANT)))
+      const response = await API.get(`therapist/${currentUser.id}/patients`, {
+        params: { patientName }
+      })
+      if(response.data.success) {
+        return response.data?.data;
+      } else {
+        rejectWithValue(response.data.error)
+      }
+    } catch (e: any) {
+      rejectWithValue(e?.response?.data?.message)
+    }
   }
 )
 
