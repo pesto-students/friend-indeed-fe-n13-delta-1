@@ -1,4 +1,4 @@
-import { Button, Typography, Select } from 'antd';
+import { Button, Typography, Select, notification } from 'antd';
 import styled from 'styled-components';
 import { GoogleLogin } from 'react-google-login'
 
@@ -34,7 +34,7 @@ function Login() {
             clientId={String(GOOGLE_CLIENTID)}
             cookiePolicy='single_host_origin'
             disabled={state.persona === ''}
-            render={(renderProps: any) => (
+            render={(renderProps) => (
               <StyledButton
                 type='text'
                 onClick={renderProps.onClick}
@@ -44,8 +44,8 @@ function Login() {
                 <GoogleIcon src={GoogleSvg} alt='google login' />
               </StyledButton>
             )}
-            onSuccess={(googleData: any) => loginAction(googleData)}
-            onFailure={() => alert("Error logging in!")}
+            onSuccess={(googleData) => loginAction(googleData)}
+          onFailure={() => notification.error({ message: "Error logging in!" })}
           />
           <Quote type='secondary' italic>
             “What mental health needs is more sunlight, more candor, and more unashamed conversation.”

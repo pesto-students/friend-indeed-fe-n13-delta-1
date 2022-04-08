@@ -1,4 +1,4 @@
-export const PROD_URL = 'http://localhost:5000/api/v1'
+export const PROD_URL = 'https://friendindeed-api.herokuapp.com//api/v1'
 
 export const STAGING_URL = 'http://localhost:5000/api/v1'
 

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { Modal, Rate, Input, Space } from 'antd'
 
 type FeedbackProps = {
@@ -21,7 +21,7 @@ const Feedback = ({
   const [notes, setNotes] = useState('')
 
   const handleRating = (value: number) => setRating(value)
-  const handleNotes = (e: any) => setNotes(e.target.value)
+  const handleNotes = (e: React.BaseSyntheticEvent) => setNotes(e.target.value)
 
   return (
     <Modal

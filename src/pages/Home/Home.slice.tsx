@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 import { RootState } from '../../redux/store';
-import { STORAGE_KEY_CONSTANT, STORAGE_USER_CONSTANT } from '../../shared/utils/constants';
+import { STORAGE_USER_CONSTANT } from '../../shared/utils/constants';
 import { API } from '../../shared/utils/helper';
 import { User } from '../MyProfile/MyProfile.slice';
 import { TherapistInfoCardProps } from './components/TherapistInfoCard/TherapistInfoCard';
