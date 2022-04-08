@@ -1,57 +1,55 @@
-import React from 'react';
-import logo from './logo.svg';
-import { Counter } from './counter/Counter';
-import './App.css';
+import { Suspense, useContext } from 'react';
+import 'react-loading-skeleton/dist/skeleton.css'
+import { ConfigProvider } from 'antd'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import {
+  LandingPage,
+  Login,
+  MyProfile,
+  MySessions,
+  PrescribeTreatment
+} from './pages';
+
+import Home from './pages/Home';
+import { AppSkeleton, NotFound, PrivateRoute, Fallback } from './shared/components';
+import { ROUTES } from './shared/utils/constants';
+import AuthContext from './shared/context/AuthContext'
+import theme from './shared/utils/theme';
 
 function App() {
+
+  ConfigProvider.config({
+    theme: {
+      primaryColor: theme.oliveGreen,
+      infoColor: theme.copperBlue,
+    }
+  })
+
+  const authContextData = useContext(AuthContext)
+  
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <Counter />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload
-        </p>
-        <span>
-          <span>Learn </span>
-          <a
-            className="App-link"
-            href="https://reactjs.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            FriendIndeed
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux-toolkit.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux Toolkit
-          </a>
-          ,<span> and </span>
-          <a
-            className="App-link"
-            href="https://react-redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React Redux
-          </a>
-        </span>
-      </header>
-    </div>
+    <Suspense fallback={<Fallback />} >
+      <AuthContext.Provider
+        value={authContextData}
+      >
+        <ConfigProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route path={ROUTES.HOME} element={<AppSkeleton />}>
+                <Route path={ROUTES.HOME} element={<LandingPage />} />
+                <Route path={ROUTES.LOGIN} element={<Login />} />
+                <Route path={ROUTES.DASHBOARD}>
+                  <Route path={ROUTES.HOME} element={<PrivateRoute><Home /></PrivateRoute>} />
+                  <Route path={ROUTES.MY_PROFILE} element={<PrivateRoute><MyProfile /></PrivateRoute>} />
+                  <Route path={ROUTES.MY_SESSIONS} element={<PrivateRoute><MySessions /></PrivateRoute>} />
+                </Route>
+              </Route>
+              <Route path='*' element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </ConfigProvider>
+      </AuthContext.Provider>
+    </Suspense>
   );
 }
 
