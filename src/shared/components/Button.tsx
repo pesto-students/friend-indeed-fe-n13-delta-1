@@ -39,7 +39,7 @@ function Button({
 export default Button;
 
 const StyledBtn = styled(Btn)<{ width: number, height?: number }>`
-  // background: ${theme.copperBlue};
+  // background: ${theme.oliveGreen};
   border: 0;
   border-radius: 50px;
   height: ${props => props.height? props.height: 40}px;
@@ -72,6 +72,7 @@ const P = styled(Typography.Text)<{ size?: number, icon?: boolean }>`
 const SubP = styled(Typography.Text)`
   font-family: DM Sans;
   font-size: 11px;
-  color: ${theme.neonGreen};
+  color: white;
   opacity: 0.8;
+  letter-spacing: 0.8;
 `;

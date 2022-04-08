@@ -114,7 +114,7 @@ function MyProfile() {
     } else {
       dispatch(fetchPatientProfileAsync(currentUser.id))
     }
-  }, [userIsTherapist])
+  }, [userIsTherapist, therapistId, editProfile])
 
   return (
     <Container>

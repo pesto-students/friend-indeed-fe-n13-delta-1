@@ -20,7 +20,7 @@ function App() {
 
   ConfigProvider.config({
     theme: {
-      primaryColor: theme.copperBlue,
+      primaryColor: theme.oliveGreen,
       infoColor: theme.copperBlue,
     }
   })

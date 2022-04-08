@@ -1,4 +1,4 @@
-import { useCallback, useState, useEffect } from "react"
+import { useCallback, useState, useEffect, FC } from "react"
 import styled from "styled-components"
 import Skeleton from "react-loading-skeleton"
 import { Typography, Input, Image, Tag, Avatar, List } from "antd"
@@ -20,7 +20,7 @@ type PatientCardProps = {
   categories: any[]
 }
 
-const PatientCard = ({ id, name, imageUrl, date, categories }: PatientCardProps) => {
+const PatientCard: FC<PatientCardProps> = ({ name, imageUrl, date, categories }: PatientCardProps) => {
   const [visible, setVisible] = useState(false);
   return (
     <PatientCardContainer>
