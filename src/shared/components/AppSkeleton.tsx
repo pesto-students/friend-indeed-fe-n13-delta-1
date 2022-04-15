@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 import styled from 'styled-components';
-import { Layout } from 'antd';
+import { Layout, BackTop } from 'antd';
 
 import { Navbar, Footer } from '.';
 import theme from '../utils/theme';
@@ -19,6 +19,7 @@ const AppSkeleton: FC = () => {
         <Outlet />
       </Content>
       <Footer />
+      <BackTop />
     </StyledLayout>
   );
 }

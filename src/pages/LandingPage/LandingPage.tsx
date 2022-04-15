@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import theme from '../../shared/utils/theme';
 import { Button } from '../../shared/components';
 import { useNavigate } from 'react-router-dom';
-import { HowToBook } from './components';
+import { HowToBook, ForTherapists, ForPatients } from './components';
 
 function LandingPage() {
 
@@ -20,7 +20,7 @@ function LandingPage() {
             <Typography.Title level={1} style={{ fontSize: 50 }}>
               Make your <br/>mental health<br/>top priority
             </Typography.Title>
-            <Typography.Title level={3} type='secondary' style={{ marginBottom: 30, width: '60%' }}>
+            <Typography.Title mark level={3} type='secondary' style={{ marginBottom: 30, width: '60%' }}>
               Consult experienced therapists from your home at ease.
             </Typography.Title>
             <ButtonGroup>
@@ -32,7 +32,8 @@ function LandingPage() {
         <Hero src={require( '../../shared/assets/Home-Hero.png')} alt='Hero image' />
       </Container>
       <HowToBook />
-      <div id="ForTherapists" style={{ height: 500 }} />
+      <ForTherapists />
+      <ForPatients />
     </>
   );
 }

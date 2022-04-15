@@ -5,10 +5,10 @@ import { FacebookFilled, TwitterCircleFilled, InstagramFilled } from '@ant-desig
 
 import theme from '../utils/theme'
 
-function Footer() {
+const Footer = () => {
   
   return (
-    <Container>
+    <Container id="ContactUs">
       <StyledRow>
         <QuickLinks>
           <Row gutter={[16, 24]}>

@@ -63,8 +63,8 @@ const Navbar = () => {
         <>
           <StyledMenu mode='horizontal' theme='light'>
             <Menu.Item key='therapist'><Link to='ForTherapists' spy smooth>For Therapists</Link></Menu.Item>
-            <Menu.Item key='patient'>For Patients</Menu.Item>
-            <Menu.Item key='contact'>Contact Us</Menu.Item>
+            <Menu.Item key='patient'><Link to='ForPatients' spy smooth>For Patients</Link></Menu.Item>
+            <Menu.Item key='contact'><Link to='ContactUs' spy smooth>Contact Us</Link></Menu.Item>
             <Menu.Item key='login'><StyledButton onClick={routeToLoginPage}>Login</StyledButton></Menu.Item>
           </StyledMenu>
         </>
