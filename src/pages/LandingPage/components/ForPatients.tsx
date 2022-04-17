@@ -1,8 +1,6 @@
 import styled from "styled-components"
-import { Steps, Typography } from "antd"
-import { LoginOutlined, FilterOutlined, CheckOutlined } from "@ant-design/icons"
+import { Typography } from "antd"
 
-import theme from "../../../shared/utils/theme"
 import PatientImg from "../../../shared/assets/Patient_Isometric.png"
 
 const ForPatients = () => {
@@ -22,7 +20,7 @@ const ForPatients = () => {
           accident, sometimes on purpose (injected humour and the like).
         </Typography.Text>
       </Content>
-      <img src={PatientImg} />
+      <Illustration src={PatientImg} />
     </Container>
   )
 }
@@ -30,7 +28,7 @@ const ForPatients = () => {
 export default ForPatients
 
 const Container = styled.div`
-  padding: 0 10%;
+  padding: 50px 10%;
   text-align: center;
   display: flex;
   justify-content: space-between;
@@ -38,9 +36,8 @@ const Container = styled.div`
   background-color: white;
 `
 
-const Illustration = styled.div`
-  dispaply: flex;
-  flex-direction: column;
+const Illustration = styled.img`
+  filter: drop-shadow(10px 10px 30px #b7154070);
 `
 
 const Content = styled.div`

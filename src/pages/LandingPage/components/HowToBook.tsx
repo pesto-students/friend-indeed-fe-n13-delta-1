@@ -1,13 +1,12 @@
 import styled from 'styled-components';
 import { Steps, Typography } from 'antd';
 import { LoginOutlined, FilterOutlined, CheckOutlined } from '@ant-design/icons'
-import { useState, useEffect } from 'react';
 import theme from '../../../shared/utils/theme';
 
 function HowToBook() {  
 
   return (
-    <Container>
+    <Container id="HowToBook">
       <Typography.Title level={3} style={{ marginBottom: 20, color: theme.copperBlue }}>
         Easy to Book
       </Typography.Title>
@@ -23,8 +22,8 @@ function HowToBook() {
 export default HowToBook;
 
 const Container = styled.div`
-  padding: 40px 20%;
-  height: 360px;
+  padding: 80px 20%;
+  height: 400px;
   background-color: white;
   text-align: center;
   display: flex;

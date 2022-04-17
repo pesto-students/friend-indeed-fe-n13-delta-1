@@ -5,6 +5,8 @@ import Navbar from "./Navbar";
 import NotFound from "./NotFound";
 import PrivateRoute from "./PrivateRoute";
 import Fallback from "./Fallback";
+import AnimatedRoutes from "./AnimatedRoutes";
+import AnimatedPage from "./AnimatedPage";
 
 export {
   Navbar,
@@ -13,5 +15,7 @@ export {
   Button,
   NotFound,
   PrivateRoute,
-  Fallback
+  Fallback,
+  AnimatedRoutes,
+  AnimatedPage,
 }

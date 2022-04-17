@@ -95,7 +95,6 @@ const Info = styled.div`
   align-items: center;
   width: 50%;
   transition: all 0.5s ease;
-  animation: land 3s ease 1s 1;
 
   @media (max-width: 450px) {
     width: 80%;
@@ -104,11 +103,6 @@ const Info = styled.div`
 
   @media (max-width: 768px) {
     width: 50%;
-  }
-
-  @keyframes land {
-    0% { translate: -10px; opacity: 0%;  }
-    100% { translate: 0; opacity: 100%;  }
   }
 `;
 
@@ -144,15 +138,8 @@ const Quote = styled(Typography.Paragraph)`
 
 const Hero = styled.img`
   width: 45%;
-  animation: land 3s ease 1s 1;
 
   @media (max-width: 451px) {
     width: 100%;
-  }
-
-  @keyframes fade {
-    0% { opacity: 0%;  }
-    50% { opacity: 50%;  }
-    100% { opacity: 100%;  }
   }
 `;

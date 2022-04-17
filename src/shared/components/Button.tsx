@@ -39,7 +39,7 @@ function Button({
 export default Button;
 
 const StyledBtn = styled(Btn)<{ width: number, height?: number }>`
-  // background: ${theme.oliveGreen};
+  background: ${theme.copperBlue};
   border: 0;
   border-radius: 50px;
   height: ${props => props.height? props.height: 40}px;

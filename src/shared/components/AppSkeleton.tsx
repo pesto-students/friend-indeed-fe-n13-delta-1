@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 import styled from 'styled-components';
 import { Layout, BackTop } from 'antd';
 
-import { Navbar, Footer } from '.';
+import { Navbar, Footer, AnimatedPage } from '.';
 import theme from '../utils/theme';
 import { Outlet } from 'react-router-dom';
 
@@ -16,7 +16,7 @@ const AppSkeleton: FC = () => {
         <Navbar />
       </StyledHeader>
       <Content>
-        <Outlet />
+        <AnimatedPage><Outlet /></AnimatedPage>
       </Content>
       <Footer />
       <BackTop />

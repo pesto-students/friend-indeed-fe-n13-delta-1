@@ -22,14 +22,10 @@ const Footer = () => {
           <Typography.Title level={5} style={{ color: theme.copperBlue }}>
             Subscribe to our weekly newsletter
           </Typography.Title>
-          <Form
-            layout='inline'
-          >
-            <Space direction='horizontal'>
-              <StyledInput placeholder='Enter your email' />
-              <StyledButton>Join</StyledButton>
-            </Space>
-          </Form>
+          <SubscriptionForm>
+            <StyledInput placeholder='Enter your email' />
+            <StyledButton>Join</StyledButton>
+          </SubscriptionForm>
         </Subscription>
       </StyledRow>
       <StyledRow alignment='center'>
@@ -71,16 +67,22 @@ const QuickLinks = styled.div`
 `;
 
 const Subscription = styled.div`
-  width: 40%;
+  width: 30%;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   font-family: DM Sans;
 `;
 
+const SubscriptionForm = styled.div`
+  width: 100%;
+  display: flex;
+`;
+
 const StyledInput = styled(Input)`
   border-radius: 7px;
   border: 0;
+  margin-right: 10px;
 `;
 
 const StyledButton = styled(Button)`

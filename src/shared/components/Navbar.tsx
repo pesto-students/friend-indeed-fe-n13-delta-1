@@ -47,7 +47,7 @@ const Navbar = () => {
         href={authenticated? '/dashboard': '/'}
       >
         <StyledAvatar size={40} shape='circle' src={LOGO_URL} />
-        <p className='logo_name'>Friend Indeed</p>
+        <p style={{margin: 0}} className='logo_name'>Friend Indeed</p>
       </LogoArea>
       {authenticated ? (
         <Profile>
@@ -98,7 +98,7 @@ const LogoArea = styled.a`
   align-items: center;
   height: 100%;
   cursor: pointer;
-  color: black;
+  color: ${theme.copperBlue};
 `;
 
 const StyledAvatar = styled(Avatar)`
