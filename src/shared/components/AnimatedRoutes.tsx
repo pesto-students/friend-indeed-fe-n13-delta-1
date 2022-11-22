@@ -9,6 +9,8 @@ import { Home, LandingPage, Login, MyProfile, MySessions } from "../../pages"
 import { AppSkeleton, NotFound, PrivateRoute } from "../../shared/components"
 import { ROUTES } from "../../shared/utils/constants"
 import AuthContext from "../../shared/context/AuthContext"
+import MyChats from "../../pages/MyChats"
+import { UpcomingMeetings } from "../../pages/Home/components"
 
 const AnimatedRoutes = () => {
   const authContextData = useContext(AuthContext)
@@ -40,7 +42,15 @@ const AnimatedRoutes = () => {
               path={ROUTES.MY_SESSIONS}
               element={
                 <PrivateRoute>
-                  <MySessions />
+                  <UpcomingMeetings />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path={ROUTES.MY_CHATS}
+              element={
+                <PrivateRoute>
+                  <MyChats />
                 </PrivateRoute>
               }
             />

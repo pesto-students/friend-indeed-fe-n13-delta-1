@@ -5,15 +5,18 @@ import { Typography } from 'antd'
 import Skeleton from 'react-loading-skeleton'
 
 import { useAppSelector } from '../../../../redux/hooks';
-import { fetchUpcomingMeetingsAsync, selectData } from '../../Home.slice';
+import { fetchUpcomingMeetingsAsync, selectData } from '../../HomeSlice';
 import theme from '../../../../shared/utils/theme';
 import { User } from '../../../MyProfile/MyProfile.slice';
 import AuthContext from '../../../../shared/context/AuthContext';
+import { title } from 'process';
 
 
 const UpcomingMeetings: FC = () => {
+  const dispatch = useDispatch()
 
   const state = useAppSelector(selectData);
+  console.log(state)
   const isLoading = state.status === 'meetingsloading'
 
   const roleMap = {
@@ -21,10 +24,14 @@ const UpcomingMeetings: FC = () => {
     [User.therapist]: User.patient.toLowerCase()
   }
 
-  if(!state.upcomingMeetings.length) return null
+ // if(!state.upcomingMeetings.length) return null
   
+  useEffect(() => {
+    dispatch(fetchUpcomingMeetingsAsync())
+  },[])
   return (
     <Container>
+
       <Typography.Title
         level={4}
         style={{ color: theme.copperBlue }}
@@ -56,7 +63,7 @@ const UpcomingMeetings: FC = () => {
             </p>
           </Timeslot>
           <TitleCard>
-            <Title>{`Session with ${meeting[roleMap[User.therapist]]?.name}`}</Title>
+            <Title>{meeting.title}</Title>
             <Link href={meeting.meetingLink} target='_blank'>Join Now</Link>
           </TitleCard>
         </MeetingCard>

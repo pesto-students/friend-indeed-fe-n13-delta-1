@@ -83,7 +83,7 @@ const SessionCard = styled.div`
   background-color: ${theme.primary};
 `
 const InfoArea = styled.div`
-  disply: flex;
+  display: flex;
   flex-direction: column;
   justify-content: space-between;
   align-items: space-between;

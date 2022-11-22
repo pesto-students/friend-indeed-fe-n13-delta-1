@@ -38,7 +38,7 @@ const HabitProgress = () => {
       ) : (
         <>
           <ProgressBox>
-            <ProgressBar width={width}>
+            <ProgressBar width={width} >
               <Appreciation className='message'>
                 <Emoji role="img" title='fire' >🔥</Emoji>
                 Awesome
@@ -84,6 +84,7 @@ const ProgressBox = styled.div`
 `;
 
 const ProgressBar = styled.div<{ width: number }>`
+  
   height: 30px;
   border-radius: 15px;
   float: left;
@@ -107,6 +108,7 @@ const ProgressBar = styled.div<{ width: number }>`
 `;
 
 const Appreciation = styled.p`
+  margin: 0px;F
   margin-left: 20px;
   animation: appear 0.5s linear 1s 1 alternate;
 

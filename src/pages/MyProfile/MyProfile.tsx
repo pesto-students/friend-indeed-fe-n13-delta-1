@@ -78,7 +78,7 @@ function MyProfile() {
     }
 
     const options = {
-        key: "rzp_test_F0sBYBI61kGSeC", // Enter the Key ID generated from the Dashboard
+        key: "13g04gTO94pn21rqQBjNb7mn", // Enter the Key ID generated from the Dashboard
         amount: (order?.fees * 100).toString(),
         currency: 'INR',
         name: "Friend Indeed",

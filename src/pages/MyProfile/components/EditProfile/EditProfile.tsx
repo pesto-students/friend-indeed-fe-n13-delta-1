@@ -25,8 +25,6 @@ function EditProfile({
   const dispatch = useDispatch()
   const { categories } = useAppSelector(selectData)
   const { status } = useAppSelector(selectProfile)
-
-  console.log(user);
   
 
   let initialValues: any = {
@@ -35,6 +33,7 @@ function EditProfile({
   }
 
   if(userIsTherapist) {
+    
     initialValues = {
       ...initialValues,
       ...user,
@@ -47,6 +46,7 @@ function EditProfile({
   const handleSubmit = async (values: any) => {
     try {
       if(userIsTherapist) {
+        console.log(values)
         dispatch(updateTherapistProfileAsync({
           id: user?.id,
           input: values

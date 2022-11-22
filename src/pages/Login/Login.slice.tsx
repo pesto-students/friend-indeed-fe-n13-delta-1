@@ -30,7 +30,7 @@ export const userLoginAsync = createAsyncThunk(
   async ({ role, profileObj }: { role: User, profileObj: any}, { rejectWithValue }) => {
     try {
       const { data } = await API.post(`/auth/login?role=${role}`, {
-        ...profileObj
+         ...profileObj?.profileObj
       })
       localStorage.setItem(STORAGE_KEY_CONSTANT, data?.access_token)
       const { data: user } = await API.get('/auth/me', {
@@ -46,6 +46,7 @@ export const userLoginAsync = createAsyncThunk(
         role,
       }
     } catch (err: any) {
+      console.log("here",err)
       return rejectWithValue(err?.response?.data)
     }
   }

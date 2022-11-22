@@ -6,6 +6,7 @@ import theme from "../../shared/utils/theme"
 import { Button } from "../../shared/components"
 import { useNavigate } from "react-router-dom"
 import { HowToBook, ForTherapists, ForPatients } from "./components"
+// import { LazyLoadImage } from "react-lazy-load-image-component";
 
 function LandingPage() {
   const navigate = useNavigate()
@@ -47,7 +48,7 @@ function LandingPage() {
             </ButtonGroup>
           </CenterWrap>
         </Info>
-        <Hero src={require("../../shared/assets/Home-Hero.png")} alt="Hero image" />
+        <Hero src={require("../../shared/assets/Home-Hero.png")} loading = "lazy" width={450} height={450} alt="Hero image" />
       </Container>
       <HowToBook />
       <ForTherapists />

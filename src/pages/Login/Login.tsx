@@ -13,7 +13,7 @@ function Login() {
 
   const dispatch = useDispatch()
   const state = useAppSelector(selectData)
-
+ 
   const loginAction = (googleData: any) => {
     dispatch(userLoginAsync({ role: state.persona, profileObj: googleData}))
   }

@@ -6,7 +6,7 @@ import DoctorImg from "../../../shared/assets/Doctor_Isometric.png"
 const ForTherapists = () => {
   return (
     <Container id="ForTherapists">
-      <Illustration src={DoctorImg} />
+      <Illustration  loading = "lazy" width={500} height={500} src={DoctorImg} />
       <Content>
         <Typography.Title level={3}>For Therapists</Typography.Title>
         <Typography.Text style={{ fontSize: 16 }}>

@@ -20,7 +20,7 @@ const ForPatients = () => {
           accident, sometimes on purpose (injected humour and the like).
         </Typography.Text>
       </Content>
-      <Illustration src={PatientImg} />
+      <Illustration loading="lazy" width={500} height={500} src={PatientImg} />
     </Container>
   )
 }
